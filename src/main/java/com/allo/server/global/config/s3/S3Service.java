@@ -27,7 +27,7 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadImageFile(MultipartFile multipartFile) throws IOException {
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
 
         String fileName = multipartFile.getOriginalFilename();
         UUID fileNameUUID = UUID.randomUUID();
@@ -48,11 +48,15 @@ public class S3Service {
             case "png":
                 contentType = "image/png";
                 break;
+            default:
+                contentType = "voice";
+                break;
         }
 
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
+            metadata.setContentLength(multipartFile.getSize());
 
             //S3 upload
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
@@ -60,31 +64,7 @@ public class S3Service {
         } catch (AmazonServiceException e) {
             e.printStackTrace();
         }
-        //이미지파일 주소 리턴
-        return amazonS3.getUrl(bucket, fileName).toString();
-    }
-
-    public String uploadVoiceFile(MultipartFile multipartFile) throws IOException {
-
-        String fileName = multipartFile.getOriginalFilename();
-        UUID fileNameUUID = UUID.randomUUID();
-
-        //파일 형식 구하기
-        String extenstion = Objects.requireNonNull(fileName).split("\\.")[1];
-        fileName = fileNameUUID + "." + extenstion;
-        String contentType = "voice";
-
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-
-            //S3 upload
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
-        }
-        //음성파일 주소 리턴
+        //파일 주소 리턴
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
