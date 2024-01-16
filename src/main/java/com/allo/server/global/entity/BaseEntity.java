@@ -23,9 +23,6 @@ import static lombok.AccessLevel.PROTECTED;
 @EntityListeners(AuditingEntityListener.class)
 @ToString
 public class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @CreatedDate
     @Column(name = "created_at")
