@@ -10,16 +10,24 @@ import lombok.Getter;
 public class NaverInfoResponse implements OAuthInfoResponse {
     @JsonProperty("response")
     private Response response;
+
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class Response {
         private String id; // 소셜 식별 값
+        private String email;
+    }
+
+    @Override
+    public String getEmail() {
+        return response.email;
     }
 
     @Override
     public SocialType getSocialType() {
         return SocialType.NAVER;
     }
+
     @Override
     public String getId() {
         return response.getId();

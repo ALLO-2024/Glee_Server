@@ -5,4 +5,5 @@ import com.allo.server.domain.user.entity.SocialType;
 public interface OAuthInfoResponse {
     SocialType getSocialType();
     String getId();
+    String getEmail();
 }

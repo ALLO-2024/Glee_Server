@@ -33,8 +33,9 @@ public class OAuthService {
         OAuthInfoResponse oAuthInfoResponse = requestOAuthInfoService.request(request);
         SocialType socialType = oAuthInfoResponse.getSocialType();
         String socialId = oAuthInfoResponse.getId();
+        String socialEmail = oAuthInfoResponse.getEmail();
 
-        Long id = findOrSaveUser(socialType, socialId); // User id 반환
+        Long id = findOrSaveUser(socialType, socialId, socialEmail); // User id 반환
 
         String role = String.valueOf(userRepository.findById(id)
                 .map(UserEntity::getRole)
@@ -48,20 +49,20 @@ public class OAuthService {
         return LoginResponse.of(role, accessToken, refreshToken);
     }
 
-    private Long findOrSaveUser(SocialType socialType, String socialId) {
+    private Long findOrSaveUser(SocialType socialType, String socialId, String email) {
 
         Optional<UserEntity> userEntity = userRepository.findBySocialTypeAndSocialId(socialType, socialId);
 
         if (userEntity.isPresent()) {
             return userEntity.get().getUserId();
         } else {
-            return saveUser(socialType, socialId);
+            return saveUser(socialType, socialId, email);
         }
     }
 
-    private Long saveUser(SocialType socialType, String socialId) {
+    private Long saveUser(SocialType socialType, String socialId, String email) {
         // 소셜 로그인 유저도 loginUser 사용 위한 email 랜덤 저장
-        String email = UUID.randomUUID() + "@socialUser.com";
+//        String email = UUID.randomUUID() + "@socialUser.com";
         UserEntity userEntity = new UserEntity(email, Role.USER, socialType, socialId);
 
         return userRepository.save(userEntity).getUserId();
