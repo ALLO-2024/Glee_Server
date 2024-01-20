@@ -60,6 +60,8 @@ public class SecurityConfig {
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/signUp")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/signUp/email")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/login/oauth2/code/kakao")).permitAll()
+                                .requestMatchers(mvcMatcherBuilder.pattern("/login/oauth2/code/naver")).permitAll()
+                                .requestMatchers(mvcMatcherBuilder.pattern("/login/oauth2/code/google")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/reissue-token")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/css/**")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/js/**")).permitAll()

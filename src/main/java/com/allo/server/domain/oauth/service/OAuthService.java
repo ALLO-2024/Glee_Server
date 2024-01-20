@@ -61,8 +61,6 @@ public class OAuthService {
     }
 
     private Long saveUser(SocialType socialType, String socialId, String email) {
-        // 소셜 로그인 유저도 loginUser 사용 위한 email 랜덤 저장
-//        String email = UUID.randomUUID() + "@socialUser.com";
         UserEntity userEntity = new UserEntity(email, Role.USER, socialType, socialId);
 
         return userRepository.save(userEntity).getUserId();
