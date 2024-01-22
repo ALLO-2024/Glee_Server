@@ -24,6 +24,10 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Spring Data Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	// S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
@@ -33,13 +37,21 @@ dependencies {
 	implementation "org.springframework.security:spring-security-test"
 
 	// jwt
+	implementation 'com.auth0:java-jwt:4.2.1'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
 	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
+	// thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
 	//oauth
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	//JAXB
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
