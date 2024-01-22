@@ -16,7 +16,7 @@ public enum ErrorCode {
     NOT_AUTHENTICATED_REQUEST("A7", "유효한 JWT 토큰이 없습니다."),
 
 
-    USER_NOT_FOUND("M1", "사용자를 찾을 수 없습니다."), // Member -> M (이동봉사자, 이동봉사 중개 통일)
+    USER_NOT_FOUND("M1", "사용자를 찾을 수 없습니다."), 
     INVALID_ROLE_NAME("M3", "유효한 ROLE_NAME 이 없습니다."),
     NOT_FOUND_ROLE_NAME("M4", "해당 토큰에서 ROLE_NAME을 찾을 수 없습니다."),
 
