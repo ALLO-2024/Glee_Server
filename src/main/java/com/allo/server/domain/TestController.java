@@ -1,6 +1,6 @@
 package com.allo.server.domain;
 
-import com.allo.server.global.config.s3.S3Service;
+import com.allo.server.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,4 +1,4 @@
-package com.allo.server.global.config.s3;
+package com.allo.server.global.s3;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
