@@ -28,8 +28,9 @@ public enum ErrorCode {
 
     UNKNOWN_LECTURE_LANGUAGE("L5", "lectureLanguage 값이 ENGLISH, CHINESE, JAPANESE와 VIETNAMESE가 아닙니다."),
     UNKNOWN_LECTURE_TYPE("L5", "lectureType 값이 MAJOR, CULTURE_ESSENTIAL와 CULTURE_SELECT가 아닙니다."),
-    UNKNOWN_LECTURE_SUBJECT("L6", "lectureSubject 값이 HUMANITY, SOCIAL, EDUCATION, SCIENCE, ENTERTAINMENT와 CULTURE가 아닙니다.")
+    UNKNOWN_LECTURE_SUBJECT("L6", "lectureSubject 값이 HUMANITY, SOCIAL, EDUCATION, SCIENCE, ENTERTAINMENT와 CULTURE가 아닙니다."),
 
+    UNKNOWN_WORD("W5", "word 값이 한국어 기초사전에 존재하지 않는 단어 입니다.")
 
     ;
 

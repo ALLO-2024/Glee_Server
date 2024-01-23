@@ -1,7 +1,6 @@
 package com.allo.server.domain.lecture.service;
 
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
-import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.LectureRepository;
 import com.allo.server.domain.user.entity.UserEntity;
@@ -15,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.allo.server.error.ErrorCode.FILE_NOT_FOUND;
 import static com.allo.server.error.ErrorCode.USER_NOT_FOUND;

@@ -30,11 +30,4 @@ public class LectureController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search/{searchContent}")
-    public ResponseEntity<List<LectureSearchResponse>> searchLecture (@AuthenticationPrincipal UserDetails loginUser, @PathVariable String searchContent) {
-
-        List<LectureSearchResponse> response = lectureService.searchLecture(loginUser.getUsername(), searchContent);
-        return ResponseEntity.ok()
-    }
-
 }
