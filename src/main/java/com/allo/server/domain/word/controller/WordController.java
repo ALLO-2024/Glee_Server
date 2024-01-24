@@ -1,6 +1,7 @@
 package com.allo.server.domain.word.controller;
 
 import com.allo.server.domain.word.dto.request.WordSaveRequest;
+import com.allo.server.domain.word.dto.response.WordGetResponse;
 import com.allo.server.domain.word.dto.response.WordSearchResponse;
 import com.allo.server.domain.word.service.WordService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,4 +35,11 @@ public class WordController {
         wordService.saveWord(loginUser.getUsername(), wordSaveRequest);
         return ResponseEntity.noContent().build();
     }
+
+//    @GetMapping("/get")
+//    public ResponseEntity<List<WordGetResponse>> getWords(@AuthenticationPrincipal UserDetails loginUser) throws IOException {
+//
+//        wordService.getWord(loginUser.getUsername());
+//        return ResponseEntity.noContent().build();
+//    }
 }

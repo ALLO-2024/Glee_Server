@@ -4,8 +4,11 @@ import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.domain.word.dto.request.WordSaveRequest;
+import com.allo.server.domain.word.dto.response.WordGetResponse;
 import com.allo.server.domain.word.dto.response.WordSearchResponse;
 import com.allo.server.domain.word.entity.Word;
+import com.allo.server.domain.word.openapi.GetExampleRequest;
+import com.allo.server.domain.word.openapi.GetExampleResponse;
 import com.allo.server.domain.word.openapi.GetMeanRequest;
 import com.allo.server.domain.word.openapi.GetMeanResponse;
 import com.allo.server.domain.word.repository.WordRepository;
@@ -30,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
 import static com.allo.server.error.ErrorCode.*;
@@ -51,7 +55,7 @@ public class WordService {
 
         Optional<Word> existWord = wordRepository.findByWord(word);
         if (existWord.isPresent()) {
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getTrans_dfn(), Boolean.TRUE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getTrans_dfn(), existWord.get().getExample(), Boolean.TRUE);
             return wordSearchResponse;
         }
         else {
@@ -62,35 +66,67 @@ public class WordService {
 
             String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8);
             GetMeanRequest getMeanRequest = new GetMeanRequest(key, encodedWord, language);
-            StringBuilder result = new StringBuilder();
+            StringBuilder meanResult = new StringBuilder();
 
             // URL 설정
-            URL url = new URL(baseUrl + getMeanRequest.getParameter());
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            URL meanUrl = new URL(baseUrl + getMeanRequest.getParameter());
+            HttpURLConnection meanUrlConnection = (HttpURLConnection) meanUrl.openConnection();
 
             // 접속
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+            meanUrlConnection.setRequestMethod("GET");
+            meanUrlConnection.connect();
 
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, StandardCharsets.UTF_8));
-            String returnLine;
-            while ((returnLine = bufferedReader.readLine()) != null) {
-                result.append(returnLine);
+            BufferedInputStream meanBufferedInputStream = new BufferedInputStream(meanUrlConnection.getInputStream());
+            BufferedReader meanBufferedReader = new BufferedReader(new InputStreamReader(meanBufferedInputStream, StandardCharsets.UTF_8));
+            String meanReturnLine;
+            while ((meanReturnLine = meanBufferedReader.readLine()) != null) {
+                meanResult.append(meanReturnLine);
             }
 
             // JSON으로 변환
-            JSONObject jsonObject = XML.toJSONObject(result.toString());
+            JSONObject meanJsonObject = XML.toJSONObject(meanResult.toString());
 
-            ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+            ObjectMapper meanMapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+            meanMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            meanMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
-            // GetMeanResponse에 매핑
-            GetMeanResponse getMeanResponse = mapper.readValue(jsonObject.toString(), GetMeanResponse.class);
+            // GetExampleResponse에 매핑
+            GetMeanResponse getMeanResponse = meanMapper.readValue(meanJsonObject.toString(), GetMeanResponse.class);
             System.out.println(getMeanResponse);
 
             if (getMeanResponse.getChannel().getItem().isEmpty())
+                throw new BadRequestException(UNKNOWN_WORD);
+
+            GetExampleRequest getExampleRequest = new GetExampleRequest(key, encodedWord);
+            StringBuilder exampleResult = new StringBuilder();
+
+            // URL 설정
+            URL exampleUrl = new URL(baseUrl + getExampleRequest.getParameter());
+            HttpURLConnection exampleUrlConnection = (HttpURLConnection) exampleUrl.openConnection();
+
+            // 접속
+            exampleUrlConnection.setRequestMethod("GET");
+            exampleUrlConnection.connect();
+
+            BufferedInputStream exampleBufferedInputStream = new BufferedInputStream(exampleUrlConnection.getInputStream());
+            BufferedReader exmapleBufferedReader = new BufferedReader(new InputStreamReader(exampleBufferedInputStream, StandardCharsets.UTF_8));
+            String exampleReturnLine;
+            while ((exampleReturnLine = exmapleBufferedReader.readLine()) != null) {
+                exampleResult.append(exampleReturnLine);
+            }
+
+            // JSON으로 변환
+            JSONObject exampleJsonObject = XML.toJSONObject(exampleResult.toString());
+
+            ObjectMapper exampleMapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+            exampleMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            exampleMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+
+            // GetMeanResponse에 매핑
+            GetExampleResponse getExampleResponse = exampleMapper.readValue(exampleJsonObject.toString(), GetExampleResponse.class);
+            System.out.println(getExampleResponse);
+
+            if (getExampleResponse.getChannel().getItem().isEmpty())
                 throw new BadRequestException(UNKNOWN_WORD);
 
             // 단어 정보
@@ -98,8 +134,9 @@ public class WordService {
             String pos = getMeanResponse.getChannel().getItem().get(0).getPos();
             String trans_word = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_word();
             String trans_dfn = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_dfn();
+            String example = getExampleResponse.getChannel().getItem().get(0).getExample();
 
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, trans_dfn, Boolean.FALSE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, trans_dfn, example, Boolean.FALSE);
 
             return wordSearchResponse;
         }
@@ -117,6 +154,16 @@ public class WordService {
             Word saveWord = WordSaveRequest.wordToEntity(userEntity, wordSaveRequest);
             wordRepository.save(saveWord);
         }
-
     }
+
+//    public List<WordGetResponse> getWord(String email){
+//
+//        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+//
+//        List<Word> words = wordRepository.findByUserId(userEntity.getUserId());
+//        for(Word word : words) {
+//            WordGetResponse wordGetResponse = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getTrans_dfn())
+//        }
+//    }
+
 }
