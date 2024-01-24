@@ -26,6 +26,7 @@ public enum ErrorCode {
     TOKEN_NOT_CREATED("T4", "토큰 생성에 실패했습니다."),
     TOKEN_NOT_MATCHED("T5", "해당 RefreshToken을 Redis에서 찾을 수 없습니다."),
 
+    LECTURE_NOT_FOUND("L1", "lectureId에 해당하는 강의를 찾을 수 없습니다."),
     UNKNOWN_LECTURE_LANGUAGE("L5", "lectureLanguage 값이 ENGLISH, CHINESE, JAPANESE와 VIETNAMESE가 아닙니다."),
     UNKNOWN_LECTURE_TYPE("L5", "lectureType 값이 MAJOR, CULTURE_ESSENTIAL와 CULTURE_SELECT가 아닙니다."),
     UNKNOWN_LECTURE_SUBJECT("L6", "lectureSubject 값이 HUMANITY, SOCIAL, EDUCATION, SCIENCE, ENTERTAINMENT와 CULTURE가 아닙니다.")

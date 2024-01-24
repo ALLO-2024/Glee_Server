@@ -2,6 +2,7 @@ package com.allo.server.domain;
 
 import com.allo.server.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
+@EnableAsync
 public class TestController {
     private final S3Service s3Service;
 

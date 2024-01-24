@@ -6,6 +6,9 @@ import com.allo.server.domain.user.dto.response.NicknameResponse;
 import com.allo.server.domain.user.dto.response.UserGetProfileResponse;
 import com.allo.server.domain.user.service.UserService;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "닉네임 중복 확인", description = "desc test")
     @PostMapping("/nickname/isDuplicated")
     public ResponseEntity<NicknameResponse> isNicknameDuplicated(@RequestBody @Valid NicknameRequest request) {
         NicknameResponse response = userService.isNicknameDuplicated(request);
