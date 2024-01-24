@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 public class SignUpController {
@@ -19,14 +21,14 @@ public class SignUpController {
     private final AuthService authService;
 
     @PostMapping("/users/signUp")
-    public ResponseEntity<Void> userSignUp(@RequestBody @Valid UserSignUpRequest request) {
-        authService.userSignUp(request);
+    public ResponseEntity<Void> userSignUp(@RequestPart (value = "UserSignUpRequest") UserSignUpRequest request, @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        authService.userSignUp(request, multipartFile);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/users/signUp/social")
-    public ResponseEntity<Void> userSocialSignUp(@AuthenticationPrincipal UserDetails loginUser, @RequestBody @Valid SocialSignUpRequest socialSignUpRequest) {
-        authService.userSocialSignUp(loginUser.getUsername(), socialSignUpRequest);
+    public ResponseEntity<Void> userSocialSignUp(@AuthenticationPrincipal UserDetails loginUser, @RequestPart (value = "SocialSignUpRequest") SocialSignUpRequest socialSignUpRequest, @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        authService.userSocialSignUp(loginUser.getUsername(), socialSignUpRequest, multipartFile);
         return ResponseEntity.noContent().build();
     }
 
