@@ -53,13 +53,14 @@ public class WordService {
 
     public WordSearchResponse searchWord(String email, String word) throws IOException {
 
-        Optional<Word> existWord = wordRepository.findByWord(word);
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+        Optional<Word> existWord = wordRepository.findByUserEntityAndWord(userEntity, word);
+
         if (existWord.isPresent()) {
             WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getTrans_dfn(), existWord.get().getExample(), Boolean.TRUE);
             return wordSearchResponse;
         }
         else {
-            UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
             Language language = userEntity.getLanguage();
 
             String baseUrl = "https://krdict.korean.go.kr/api/search";
@@ -146,7 +147,7 @@ public class WordService {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
-        Optional<Word> existWord = wordRepository.findByWord(wordSaveRequest.word());
+        Optional<Word> existWord = wordRepository.findByUserEntityAndWord(userEntity, wordSaveRequest.word());
         if (existWord.isPresent()) {
             throw new BadRequestException(ALREADY_EXIST_WORD);
         }
