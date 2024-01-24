@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Translation {
     private String trans_word;
-    private String trans_dfn;
 }

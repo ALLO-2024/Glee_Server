@@ -57,7 +57,7 @@ public class WordService {
         Optional<Word> existWord = wordRepository.findByUserEntityAndWord(userEntity, word);
 
         if (existWord.isPresent()) {
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getTrans_dfn(), existWord.get().getExample(), Boolean.TRUE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getExample(), Boolean.TRUE);
             return wordSearchResponse;
         }
         else {
@@ -134,10 +134,9 @@ public class WordService {
             String meaning = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getDefinition();
             String pos = getMeanResponse.getChannel().getItem().get(0).getPos();
             String trans_word = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_word();
-            String trans_dfn = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_dfn();
             String example = getExampleResponse.getChannel().getItem().get(0).getExample();
 
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, trans_dfn, example, Boolean.FALSE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, example, Boolean.FALSE);
 
             return wordSearchResponse;
         }
@@ -163,7 +162,7 @@ public class WordService {
 //
 //        List<Word> words = wordRepository.findByUserId(userEntity.getUserId());
 //        for(Word word : words) {
-//            WordGetResponse wordGetResponse = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getTrans_dfn())
+//            WordGetResponse wordGetResponse = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word())
 //        }
 //    }
 
