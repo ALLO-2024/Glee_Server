@@ -23,13 +23,19 @@ public class Word extends BaseEntity {
 
     private String meaning;
 
-    private String example;
+    private String pos;
+
+    private String trans_word;
+
+    private String trans_dfn;
 
     @Builder
-    public Word(UserEntity userEntity, String word, String meaning, String example) {
+    public Word(UserEntity userEntity, String word, String meaning, String pos, String trans_word, String trans_dfn) {
         this.userEntity = userEntity;
         this.word = word;
         this.meaning = meaning;
-        this.example = example;
+        this.pos = pos;
+        this.trans_word = trans_word;
+        this.trans_dfn = trans_dfn;
     }
 }

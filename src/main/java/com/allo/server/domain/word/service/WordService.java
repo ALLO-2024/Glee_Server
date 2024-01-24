@@ -1,5 +1,6 @@
 package com.allo.server.domain.word.service;
 
+import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.domain.word.dto.request.WordSaveRequest;
@@ -31,8 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static com.allo.server.error.ErrorCode.UNKNOWN_WORD;
-import static com.allo.server.error.ErrorCode.USER_NOT_FOUND;
+import static com.allo.server.error.ErrorCode.*;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 @Service
@@ -51,15 +51,17 @@ public class WordService {
 
         Optional<Word> existWord = wordRepository.findByWord(word);
         if (existWord.isPresent()) {
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getExample(), Boolean.TRUE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getTrans_dfn(), Boolean.TRUE);
             return wordSearchResponse;
         }
         else {
+            UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+            Language language = userEntity.getLanguage();
 
             String baseUrl = "https://krdict.korean.go.kr/api/search";
 
             String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8);
-            GetMeanRequest getMeanRequest = new GetMeanRequest(key, encodedWord);
+            GetMeanRequest getMeanRequest = new GetMeanRequest(key, encodedWord, language);
             StringBuilder result = new StringBuilder();
 
             // URL 설정
@@ -84,30 +86,37 @@ public class WordService {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
-            // GetMeansRes에 매핑
+            // GetMeanResponse에 매핑
             GetMeanResponse getMeanResponse = mapper.readValue(jsonObject.toString(), GetMeanResponse.class);
             System.out.println(getMeanResponse);
 
             if (getMeanResponse.getChannel().getItem().isEmpty())
                 throw new BadRequestException(UNKNOWN_WORD);
 
-            // DB에 뜻 저장
+            // 단어 정보
             String meaning = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getDefinition();
-            String example = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getDefinition();
+            String pos = getMeanResponse.getChannel().getItem().get(0).getPos();
+            String trans_word = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_word();
+            String trans_dfn = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_dfn();
 
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, example, Boolean.FALSE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, trans_dfn, Boolean.FALSE);
 
             return wordSearchResponse;
         }
     }
 
-    public void saveWord(String email, WordSaveRequest wordSaveRequest) throws IOException {
+    public void saveWord(String email, WordSaveRequest wordSaveRequest){
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
-        Word saveWord = WordSaveRequest.wordToEntity(userEntity, wordSaveRequest);
-
-        wordRepository.save(saveWord);
+        Optional<Word> existWord = wordRepository.findByWord(wordSaveRequest.word());
+        if (existWord.isPresent()) {
+            throw new BadRequestException(ALREADY_EXIST_WORD);
+        }
+        else {
+            Word saveWord = WordSaveRequest.wordToEntity(userEntity, wordSaveRequest);
+            wordRepository.save(saveWord);
+        }
 
     }
 }

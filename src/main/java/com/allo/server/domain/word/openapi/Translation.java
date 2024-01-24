@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Sense {
-    private int sense_order;
-    private String definition;
-    private List<Translation> translation;
+public class Translation {
+    private String trans_word;
+    private String trans_dfn;
 }
