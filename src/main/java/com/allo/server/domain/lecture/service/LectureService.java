@@ -132,13 +132,6 @@ public class LectureService {
                 requestEntity,
                 String.class);
 
-
-        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("category", category);
-        bodyBuilder.part("lectureId", lectureId);
-        bodyBuilder.part("file", new ByteArrayResource(Files.readAllBytes(file.toPath())))
-                .filename(file.getName());
-
         // 응답 확인
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
@@ -157,6 +150,45 @@ public class LectureService {
             lecture.setContent(content);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Async
+    @Transactional
+    public void requestTranslate(Long lectureId) {
+        Lecture lecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
+        Content content = lecture.getContent();
+
+        // 대상 서버 URL
+        String targetUrl = "http://59.29.138.9:5603/glee/translate";
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 요청 파라미터 및 파일 설정
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("contents", content.getContent());
+        body.add("language", "eng");
+
+        // HTTP 엔터티 생성
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // 서버로 POST 요청 전송
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                targetUrl,
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        // 응답 확인
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        String responseBody = responseEntity.getBody();
+
+        if (responseBody != null) {
+            content.setTranslatedContent(responseBody);
         }
     }
 

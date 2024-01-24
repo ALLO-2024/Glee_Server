@@ -34,29 +34,9 @@ public class LectureController {
         return ResponseEntity.noContent().build();
     }
 
-/*
-    @GetMapping("/test")
-    public ResponseEntity<Void> testLecture(@AuthenticationPrincipal UserDetails loginUser,
-                                            @RequestPart (value = "test") String lectureSaveRequest,
-                                            @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
-        String LOCAL_STORAGE_PATH = "/path/to/local/storage/";
-
-        // 원본 파일명
-        String originalFileName = multipartFile.getOriginalFilename();
-
-        // 로컬 저장 경로에 저장할 파일 객체 생성
-        File localFile = new File(LOCAL_STORAGE_PATH + originalFileName);
-        localFile.getParentFile().mkdirs();
-
-        // MultipartFile의 InputStream을 사용하여 파일을 로컬에 저장
-        try (OutputStream outputStream = new FileOutputStream(localFile)) {
-            byte[] bytes = multipartFile.getBytes();
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            throw new IOException("Failed to store file " + originalFileName, e);
-        }
-
-        lectureService.requestFileToText("eng", "2", localFile);
+    @PostMapping("/translate/{lectureId}")
+    public ResponseEntity<Void> translateLectureContent(@PathVariable Long lectureId) {
+        lectureService.requestTranslate(lectureId);
         return ResponseEntity.noContent().build();
-    }*/
+    }
 }

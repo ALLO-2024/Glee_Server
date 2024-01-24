@@ -5,10 +5,12 @@ import com.allo.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Content extends BaseEntity {
@@ -24,4 +26,8 @@ public class Content extends BaseEntity {
 
     @Lob
     private String translatedContent;
+
+    public void setTranslatedContent(String translatedContent) {
+        this.translatedContent = translatedContent;
+    }
 }
