@@ -132,13 +132,6 @@ public class LectureService {
                 requestEntity,
                 String.class);
 
-
-        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("category", category);
-        bodyBuilder.part("lectureId", lectureId);
-        bodyBuilder.part("file", new ByteArrayResource(Files.readAllBytes(file.toPath())))
-                .filename(file.getName());
-
         // 응답 확인
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
