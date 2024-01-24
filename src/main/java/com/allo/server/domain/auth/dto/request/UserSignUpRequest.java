@@ -3,6 +3,7 @@ package com.allo.server.domain.auth.dto.request;
 import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.Role;
 import com.allo.server.domain.user.entity.UserEntity;
+import com.allo.server.global.annotation.Enum;
 import jakarta.validation.constraints.*;
 
 public record UserSignUpRequest(@Email(message="이메일 형식에 맞지 않습니다.")
@@ -14,6 +15,7 @@ public record UserSignUpRequest(@Email(message="이메일 형식에 맞지 않�
                                      String nickname,
                                      Boolean isOptionAgr,
                                      @NotBlank(message = "language 필수 입력 값입니다.")
+                                     @Enum(enumClass = Language.class)
                                      Language language) {
 
     public UserEntity toEntity(String profileImageUrl) {
