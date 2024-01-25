@@ -56,6 +56,9 @@ dependencies {
 	//JAXB
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
+	// XML -> JSON
+	implementation group: 'org.json', name: 'json', version: '20220320'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
