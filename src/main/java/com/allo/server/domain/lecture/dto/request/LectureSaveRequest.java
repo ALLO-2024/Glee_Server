@@ -6,7 +6,6 @@ import com.allo.server.domain.lecture.entity.LectureType;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.global.annotation.Enum;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record LectureSaveRequest (@NotBlank(message = "제목은 필수 입력 값입니다.")
