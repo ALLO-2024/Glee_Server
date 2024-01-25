@@ -23,6 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -156,14 +161,21 @@ public class WordService {
         }
     }
 
-//    public List<WordGetResponse> getWord(String email){
-//
-//        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
-//
-//        List<Word> words = wordRepository.findByUserId(userEntity.getUserId());
-//        for(Word word : words) {
-//            WordGetResponse wordGetResponse = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word())
-//        }
-//    }
+    public Page<WordGetResponse> getWord(String email, Pageable pageable){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        int pageLoc = pageable.getPageNumber() - 1; // page 위치에 있는 값은 0부터 시작한다.
+        int pageLimit = 3; // 한페이지에 보여줄 글 개수
+
+        PageRequest pageRequest = PageRequest.of(pageLoc, pageLimit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Word> pages = wordRepository.findAllByUserEntity(userEntity, pageRequest);
+        Page<WordGetResponse> wordGetResponses = pages.map(
+                page -> new WordGetResponse(page.getWord(), page.getMeaning(), page.getPos(), page.getTrans_word(), page.getExample()));
+
+
+        return wordGetResponses;
+    }
+
 
 }

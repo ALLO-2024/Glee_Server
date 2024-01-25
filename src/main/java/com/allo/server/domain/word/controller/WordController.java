@@ -5,6 +5,9 @@ import com.allo.server.domain.word.dto.response.WordGetResponse;
 import com.allo.server.domain.word.dto.response.WordSearchResponse;
 import com.allo.server.domain.word.service.WordService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,10 +39,11 @@ public class WordController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/get")
-//    public ResponseEntity<List<WordGetResponse>> getWords(@AuthenticationPrincipal UserDetails loginUser) throws IOException {
-//
-//        wordService.getWord(loginUser.getUsername());
-//        return ResponseEntity.noContent().build();
-//    }
+    @GetMapping("/get")
+    public ResponseEntity<List<WordGetResponse>> getWords(@AuthenticationPrincipal UserDetails loginUser,
+                                                          @PageableDefault(page = 1) Pageable pageable) throws IOException {
+
+        Page<WordGetResponse> response =  wordService.getWord(loginUser.getUsername(), pageable);
+        return ResponseEntity.ok(response.getContent());
+    }
 }
