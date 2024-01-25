@@ -7,8 +7,6 @@ import com.allo.server.domain.user.dto.response.UserGetProfileResponse;
 import com.allo.server.domain.user.service.UserService;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +34,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "회원 정보 API")
     @GetMapping("/my/profile")
     public ResponseEntity<UserGetProfileResponse> getMyProfile(@AuthenticationPrincipal UserDetails loginUser) {
         UserGetProfileResponse response = userService.getMyProfile(loginUser.getUsername());
