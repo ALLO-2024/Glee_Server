@@ -30,7 +30,7 @@ public class SignUpController {
 
     @Operation(summary = "소셜 로그인 회원가입")
     @PatchMapping("/users/signUp/social")
-    public ResponseEntity<Void> userSocialSignUp(@AuthenticationPrincipal UserDetails loginUser, @RequestPart (value = "SocialSignUpRequest") SocialSignUpRequest socialSignUpRequest, @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<Void> userSocialSignUp(@AuthenticationPrincipal UserDetails loginUser,@Valid @RequestPart (value = "SocialSignUpRequest") SocialSignUpRequest socialSignUpRequest, @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
         authService.userSocialSignUp(loginUser.getUsername(), socialSignUpRequest, multipartFile);
         return ResponseEntity.noContent().build();
     }

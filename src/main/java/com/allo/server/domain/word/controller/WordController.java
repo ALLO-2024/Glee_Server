@@ -5,6 +5,7 @@ import com.allo.server.domain.word.dto.response.WordGetResponse;
 import com.allo.server.domain.word.dto.response.WordSearchResponse;
 import com.allo.server.domain.word.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class WordController {
     @Operation(summary = "단어 저장 API")
     @PostMapping("/save")
     public ResponseEntity<Void> saveWord(@AuthenticationPrincipal UserDetails loginUser,
-                                           @RequestPart(value = "WordSaveRequest") WordSaveRequest wordSaveRequest) throws IOException {
+                                           @Valid @RequestPart(value = "WordSaveRequest") WordSaveRequest wordSaveRequest) throws IOException {
 
         wordService.saveWord(loginUser.getUsername(), wordSaveRequest);
         return ResponseEntity.noContent().build();

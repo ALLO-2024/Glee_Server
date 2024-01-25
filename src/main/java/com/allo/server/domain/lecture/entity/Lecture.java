@@ -33,22 +33,18 @@ public class Lecture extends BaseEntity {
     private int semester;
 
     @Enumerated(EnumType.STRING)
-    private LectureLanguage lectureLanguage;
-
-    @Enumerated(EnumType.STRING)
     private LectureType lectureType;
 
     @Enumerated(EnumType.STRING)
     private LectureSubject lectureSubject;
 
     @Builder
-    public Lecture(UserEntity userEntity, String fileUrl, String title, int year, int semester, LectureLanguage lectureLanguage, LectureType lectureType, LectureSubject lectureSubject) {
+    public Lecture(UserEntity userEntity, String fileUrl, String title, int year, int semester, LectureType lectureType, LectureSubject lectureSubject) {
         this.userEntity = userEntity;
         this.fileUrl = fileUrl;
         this.title = title;
         this.year = year;
         this.semester = semester;
-        this.lectureLanguage = lectureLanguage;
         this.lectureType = lectureType;
         this.lectureSubject = lectureSubject;
     }
