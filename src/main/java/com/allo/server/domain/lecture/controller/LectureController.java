@@ -3,11 +3,13 @@ package com.allo.server.domain.lecture.controller;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.service.LectureService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +29,7 @@ public class LectureController {
 
     @PostMapping("/save")
     public ResponseEntity<Void> saveLecture(@AuthenticationPrincipal UserDetails loginUser,
-    @RequestPart (value = "LectureCreateRequest") LectureSaveRequest lectureSaveRequest,
+    @RequestPart(value = "LectureCreateRequest") LectureSaveRequest lectureSaveRequest,
     @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
 
         lectureService.saveLecture(loginUser.getUsername(), lectureSaveRequest, multipartFile);

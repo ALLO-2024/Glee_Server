@@ -5,6 +5,7 @@ import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.LectureRepository;
+import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
@@ -71,6 +72,7 @@ public class LectureService {
         Lecture lecture = LectureSaveRequest.lectureToEntity(userEntity, fileUrl, year, semester, lectureSaveRequest);
         lectureRepository.save(lecture);
 
+        Language language = userEntity.getLanguage();
         File file = saveFileInLocal(multipartFile);
         requestFileToText("eng", lecture.getLectureId(), file);
     }
