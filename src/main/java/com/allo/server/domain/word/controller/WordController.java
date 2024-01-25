@@ -4,6 +4,7 @@ import com.allo.server.domain.word.dto.request.WordSaveRequest;
 import com.allo.server.domain.word.dto.response.WordGetResponse;
 import com.allo.server.domain.word.dto.response.WordSearchResponse;
 import com.allo.server.domain.word.service.WordService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ public class WordController {
 
     private final WordService wordService;
 
+    @Operation(summary = "단어 검색 API")
     @GetMapping("/search/{word}")
     public ResponseEntity<WordSearchResponse> searchWord(@AuthenticationPrincipal UserDetails loginUser,
                                             @PathVariable String word) throws IOException {
@@ -31,6 +33,7 @@ public class WordController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "단어 저장 API")
     @PostMapping("/save")
     public ResponseEntity<Void> saveWord(@AuthenticationPrincipal UserDetails loginUser,
                                            @RequestPart(value = "WordSaveRequest") WordSaveRequest wordSaveRequest) throws IOException {
@@ -39,6 +42,7 @@ public class WordController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "저장된 단어 검색 API")
     @GetMapping("/get")
     public ResponseEntity<List<WordGetResponse>> getWords(@AuthenticationPrincipal UserDetails loginUser,
                                                           @PageableDefault(page = 1) Pageable pageable) throws IOException {
