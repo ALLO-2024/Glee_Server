@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 .requestMatchers(mvcMatcherBuilder.pattern("/swagger-resources/**")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/v3/api-docs/**")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/nickname/isDuplicated")).permitAll()
+                                .requestMatchers(mvcMatcherBuilder.pattern("/lectures/test")).permitAll() // 테스트
                                 .anyRequest().authenticated())
                 .addFilterAfter(customUserAuthFilter(), LogoutFilter.class)
                 .addFilterBefore(jwtAuthenticationProcessingFilter(), CustomUserAuthFilter.class)

@@ -1,12 +1,10 @@
 package com.allo.server.domain.lecture.entity;
 
-import com.allo.server.domain.user.entity.Role;
-import com.allo.server.domain.user.entity.SocialType;
+import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +19,9 @@ public class Lecture extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity userEntity;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Content content;
 
     private String fileUrl;
 
@@ -50,5 +51,9 @@ public class Lecture extends BaseEntity {
         this.lectureLanguage = lectureLanguage;
         this.lectureType = lectureType;
         this.lectureSubject = lectureSubject;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
     }
 }
