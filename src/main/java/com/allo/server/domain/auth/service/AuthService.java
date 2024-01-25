@@ -2,6 +2,7 @@ package com.allo.server.domain.auth.service;
 
 import com.allo.server.domain.auth.dto.request.SocialSignUpRequest;
 import com.allo.server.domain.auth.dto.request.UserSignUpRequest;
+import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.Role;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static com.allo.server.error.ErrorCode.*;
 
@@ -32,7 +35,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RedisUtil redisUtil;
 
-    public void userSignUp(UserSignUpRequest request) {
+    public void userSignUp(UserSignUpRequest request, MultipartFile multipartFile) throws IOException {
 
         if (userRepository.existsByEmail(request.email())) {
             throw new BadRequestException(ALREADY_EXIST_EMAIL);
@@ -41,13 +44,21 @@ public class AuthService {
             throw new BadRequestException(ALREADY_EXIST_NICKNAME);
         }
 
-        UserEntity userEntity = request.toEntity();
+        String profileImageUrl;
+        if (multipartFile.isEmpty() || multipartFile == null){
+            throw new BadRequestException(FILE_NOT_FOUND);
+        }
+        else {
+            profileImageUrl = s3Service.uploadFile(multipartFile);
+        }
+
+        UserEntity userEntity = request.toEntity(profileImageUrl);
         userEntity.passwordEncode(passwordEncoder);
         userRepository.save(userEntity);
     }
 
 
-    public void userSocialSignUp(String email, SocialSignUpRequest socialSignUpRequest) {
+    public void userSocialSignUp(String email, SocialSignUpRequest socialSignUpRequest, MultipartFile multipartFile) throws IOException {
 
         if (userRepository.existsByNickname(socialSignUpRequest.nickname())) {
             throw new BadRequestException(ALREADY_EXIST_NICKNAME);
@@ -57,8 +68,18 @@ public class AuthService {
 
         // 추가 정보 업데이트
         String nickname = socialSignUpRequest.nickname();
+        Language language = socialSignUpRequest.language();
         Boolean isOptionAgr = socialSignUpRequest.isOptionAgr();
-        userEntity.updateSocialUser(nickname, Role.USER, isOptionAgr);
+
+        String profileImageUrl;
+        if (multipartFile.isEmpty() || multipartFile == null){
+            throw new BadRequestException(FILE_NOT_FOUND);
+        }
+        else {
+            profileImageUrl = s3Service.uploadFile(multipartFile);
+        }
+
+        userEntity.updateSocialUser(nickname, profileImageUrl, Role.USER, language, isOptionAgr);
     }
 
     public void userLogout(HttpServletRequest request, String email) {

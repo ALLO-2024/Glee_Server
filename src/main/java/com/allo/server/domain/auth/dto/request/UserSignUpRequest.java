@@ -1,11 +1,10 @@
 package com.allo.server.domain.auth.dto.request;
 
+import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.Role;
 import com.allo.server.domain.user.entity.UserEntity;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.allo.server.global.annotation.Enum;
+import jakarta.validation.constraints.*;
 
 public record UserSignUpRequest(@Email(message="이메일 형식에 맞지 않습니다.")
                                      @NotBlank(message = "이메일은 필수 입력 값입니다.") String email,
@@ -14,10 +13,12 @@ public record UserSignUpRequest(@Email(message="이메일 형식에 맞지 않�
                                      @NotBlank(message = "닉네임은 필수 입력 값입니다.")
                                      @Size(min=2, max=10, message = "닉네임은 2~10자로 입력해 주세요.")
                                      String nickname,
-                                     String profileImageUrl,
-                                     Boolean isOptionAgr) {
+                                     Boolean isOptionAgr,
+                                     @NotBlank(message = "language 필수 입력 값입니다.")
+                                     @Enum(enumClass = Language.class)
+                                     Language language) {
 
-    public UserEntity toEntity() {
+    public UserEntity toEntity(String profileImageUrl) {
         return UserEntity.builder()
                 .email(email)
                 .password(password)
@@ -25,6 +26,7 @@ public record UserSignUpRequest(@Email(message="이메일 형식에 맞지 않�
                 .profileImageUrl(profileImageUrl)
                 .isOptionAgr(isOptionAgr)
                 .role(Role.USER)
+                .language(language)
                 .build();
     }
 }

@@ -6,6 +6,5 @@ import java.sql.Timestamp;
 
 public record LectureSearchResponse (Long lectureId, String title,
                                     LectureType lectureType,
-                                    Timestamp createdAt)
-{
+                                    Timestamp createdAt) {
 }
