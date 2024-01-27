@@ -37,8 +37,8 @@ public class LectureController {
     }
 
     @PostMapping("/translate/{lectureId}")
-    public ResponseEntity<Void> translateLectureContent(@PathVariable Long lectureId) {
-        lectureService.requestTranslate(lectureId);
+    public ResponseEntity<Void> translateLectureContent(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long lectureId) {
+        lectureService.requestTranslate(loginUser.getUsername(), lectureId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -156,7 +156,10 @@ public class LectureService {
 
     @Async
     @Transactional
-    public void requestTranslate(Long lectureId) {
+    public void requestTranslate(String email, Long lectureId) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
         Lecture lecture = lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
         Content content = lecture.getContent();
@@ -172,7 +175,7 @@ public class LectureService {
         // 요청 파라미터 및 파일 설정
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("contents", content.getContent());
-        body.add("language", "eng");
+        body.add("language", userEntity.getLanguage().toString());
 
         // HTTP 엔터티 생성
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
