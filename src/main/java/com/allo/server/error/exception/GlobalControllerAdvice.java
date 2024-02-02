@@ -29,13 +29,13 @@ public class GlobalControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(final BadRequestException e) {
         log.info("Bad Request: {}", e);
-        return ResponseEntity.badRequest().body(ErrorResponse.of(e.getCode(), e.getMessage()));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(e.getIsSuccess(), e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(final TokenException e) {
         log.info("Invalid Token: {}", e);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(e.getCode(), e.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(e.getIsSuccess(), e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler
@@ -47,7 +47,7 @@ public class GlobalControllerAdvice {
         List<String> errorList = bindingResult.getFieldErrors().stream().map(err -> err.getDefaultMessage()).collect(Collectors.toList());
         log.warn("MethodArgumentNotValidExceptionException = {}", errorList);
 
-        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of("V1", firstErrorMessage));
+        return ResponseEntity.status(BAD_REQUEST).body(ErrorResponse.of(false,9000, firstErrorMessage));
     }
 
 
