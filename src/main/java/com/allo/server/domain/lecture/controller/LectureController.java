@@ -52,12 +52,12 @@ public class LectureController {
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 
-//    @Operation(summary = "저장된 강의 조회 API")
-//    @GetMapping("/{year}/{semester}")
-//    public ResponseEntity<BaseResponse<List<LectureSearchResponse>>> getLectures(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
-//
-//        List<LectureSearchResponse> response = lectureService.getLecture(loginUser.getUsername(), year, semester);
-//        return ResponseEntity.ok(new BaseResponse<>(response));
-//    }
+    @Operation(summary = "저장된 강의 조회 API")
+    @GetMapping("/{year}/{semester}")
+    public ResponseEntity<BaseResponse<List<LectureSearchResponse>>> getLectures(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
+
+        List<LectureSearchResponse> response = lectureService.getLecture(loginUser.getUsername(), year, semester);
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
 
 }
