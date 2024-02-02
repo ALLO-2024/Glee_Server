@@ -3,6 +3,7 @@ package com.allo.server.domain.lecture.controller;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.service.LectureService;
+import com.allo.server.response.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import static com.allo.server.response.BaseResponseStatus.SUCCESS;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/lectures")
@@ -28,17 +31,17 @@ public class LectureController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<Void> saveLecture(@AuthenticationPrincipal UserDetails loginUser,
-    @RequestPart(value = "LectureCreateRequest") LectureSaveRequest lectureSaveRequest,
-    @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<BaseResponse> saveLecture(@AuthenticationPrincipal UserDetails loginUser,
+                                                    @RequestPart(value = "LectureCreateRequest") LectureSaveRequest lectureSaveRequest,
+                                                    @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
 
         lectureService.saveLecture(loginUser.getUsername(), lectureSaveRequest, multipartFile);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 
     @PostMapping("/translate/{lectureId}")
-    public ResponseEntity<Void> translateLectureContent(@PathVariable Long lectureId) {
+    public ResponseEntity<BaseResponse> translateLectureContent(@PathVariable Long lectureId) {
         lectureService.requestTranslate(lectureId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 }
