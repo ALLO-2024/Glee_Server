@@ -3,6 +3,7 @@ package com.allo.server.domain.oauth.controller;
 import com.allo.server.domain.oauth.dto.request.SocialLoginRequest;
 import com.allo.server.domain.oauth.dto.response.LoginResponse;
 import com.allo.server.domain.oauth.service.OAuthService;
+import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,9 @@ public class OAuthController {
 
     @Operation(summary = "소셜 로그인 API")
     @PostMapping("/users/login/social")
-    public ResponseEntity<LoginResponse> userSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
+    public ResponseEntity<BaseResponse<LoginResponse>> userSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         LoginResponse response = oAuthService.userSocialLogin(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new BaseResponse<>(response));
     }
 
 }

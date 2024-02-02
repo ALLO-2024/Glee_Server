@@ -31,7 +31,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         // 필요한 권한이 없이 접근하려 할때 403
         log.info("허가 받지 않은 사용자의 접근입니다.");
-        ErrorResponse errorResponse = ErrorResponse.of(NOT_ALLOWED_MEMBER.getCode(), NOT_ALLOWED_MEMBER.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(NOT_ALLOWED_MEMBER.isSuccess(), NOT_ALLOWED_MEMBER.getCode(), NOT_ALLOWED_MEMBER.getMessage());
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);
 
         response.setContentType("application/json");

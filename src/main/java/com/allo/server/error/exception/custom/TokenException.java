@@ -6,12 +6,14 @@ import lombok.Getter;
 @Getter
 public class TokenException extends RuntimeException {
 
-    private final String code;
+    private final Boolean isSuccess;
+    private final int code;
+    private final String message;
 
     public TokenException(final ErrorCode errorCode) {
-        super(errorCode.getMessage());
+        this.isSuccess = errorCode.isSuccess();
         this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
     }
-
 
 }
