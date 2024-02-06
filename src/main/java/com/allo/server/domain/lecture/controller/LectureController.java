@@ -2,10 +2,12 @@ package com.allo.server.domain.lecture.controller;
 
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSummaryResponseDto;
 import com.allo.server.domain.lecture.service.LectureService;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/lectures")
 public class LectureController {
@@ -39,6 +42,13 @@ public class LectureController {
     @PostMapping("/translate/{lectureId}")
     public ResponseEntity<Void> translateLectureContent(@PathVariable Long lectureId) {
         lectureService.requestTranslate(lectureId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/summary/{lectureId}")
+    public ResponseEntity<LectureSummaryResponseDto> summaryLectureContent(@PathVariable Long lectureId) {
+        LectureSummaryResponseDto responseDto = lectureService.sendRequestToGpt(lectureId);
+        log.info("response: {}", responseDto);
         return ResponseEntity.noContent().build();
     }
 }

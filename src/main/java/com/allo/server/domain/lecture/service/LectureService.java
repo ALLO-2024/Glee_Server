@@ -3,12 +3,15 @@ package com.allo.server.domain.lecture.service;
 import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
+import com.allo.server.domain.lecture.dto.request.LectureSummaryRequestDto;
+import com.allo.server.domain.lecture.dto.response.LectureSummaryResponseDto;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.LectureRepository;
 import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
+import com.allo.server.global.config.ChatGptConfig;
 import com.allo.server.global.s3.S3Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -198,5 +201,41 @@ public class LectureService {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("file", fileName);
         return headers;
+    }
+
+    public HttpEntity<LectureSummaryRequestDto> buildHttpEntity(LectureSummaryRequestDto requestDto) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(ChatGptConfig.MEDIA_TYPE));
+        headers.add(ChatGptConfig.AUTHORIZATION, ChatGptConfig.BEARER + ChatGptConfig.API_KEY);
+        return new HttpEntity<>(requestDto, headers);
+    }
+
+    public LectureSummaryResponseDto getResponse(HttpEntity<LectureSummaryRequestDto> chatGptRequestDtoHttpEntity) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<LectureSummaryResponseDto> responseEntity = restTemplate.postForEntity(
+                ChatGptConfig.URL,
+                chatGptRequestDtoHttpEntity,
+                LectureSummaryResponseDto.class);
+
+        return responseEntity.getBody();
+    }
+
+    public LectureSummaryResponseDto sendRequestToGpt(Long lectureId) {
+        Lecture lecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
+        String content = lecture.getContent().getContent();
+
+        return this.getResponse(
+                this.buildHttpEntity(
+                        new LectureSummaryRequestDto(
+                                ChatGptConfig.MODEL,
+                                content,
+                                ChatGptConfig.MAX_TOKEN,
+                                ChatGptConfig.TEMPERATURE,
+                                ChatGptConfig.TOP_P
+                        )
+                )
+        );
     }
 }
