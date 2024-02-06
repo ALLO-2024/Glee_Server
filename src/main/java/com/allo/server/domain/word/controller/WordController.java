@@ -51,7 +51,7 @@ public class WordController {
     public ResponseEntity<BaseResponse<List<WordGetResponse>>> getWords(@AuthenticationPrincipal UserDetails loginUser,
                                                           @PageableDefault(page = 1) Pageable pageable) throws IOException {
 
-        Page<WordGetResponse> response =  wordService.getWord(loginUser.getUsername(), pageable);
-        return ResponseEntity.ok(new BaseResponse<>(response.getContent()));
+        List<WordGetResponse> response =  wordService.getWord(loginUser.getUsername(), pageable);
+        return ResponseEntity.ok(new BaseResponse<>(response));
     }
 }
