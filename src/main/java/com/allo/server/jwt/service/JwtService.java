@@ -102,9 +102,8 @@ public class JwtService {
     /**
      * 로그인 시 AccessToken + RefreshToken 바디에 실어서 보내기
      */
-    public Map<String, String> sendAccessAndRefreshToken(String roleName, String accessToken, String refreshToken) {
+    public Map<String, String> sendAccessAndRefreshToken(String accessToken, String refreshToken) {
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("roleName", roleName);
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
         return tokens;
@@ -200,7 +199,6 @@ public class JwtService {
      */
     public LoginResponse reIssueToken(String refreshToken) {
 
-        // AccessToken 으로 이동봉사자 id, roleName 찾기
         Long id = extractId(refreshToken).orElseThrow(() -> new TokenException(INVALID_TOKEN));
         String roleName = extractRoleName(refreshToken).orElseThrow(() -> new TokenException(INVALID_TOKEN));
 
@@ -215,7 +213,6 @@ public class JwtService {
                 newRefreshToken = createRefreshToken(id, roleName);
                 break;
             default:
-                log.error("해당 ROLE_NAME을 가진 이동봉사자/중개를 찾을 수 없습니다.");
                 throw new BadRequestException(INVALID_ROLE_NAME); // 다른 roleName 들어왔을 경우의 예외 처리
         }
 
@@ -242,7 +239,6 @@ public class JwtService {
                         userRepository.findById(id).ifPresent(this::saveUserAuthentication);
                         break;
                     default:
-                        log.error("해당 ROLE_NAME을 가진 이동봉사자/중개를 찾을 수 없습니다.");
                         throw new BadRequestException(INVALID_ROLE_NAME); // 다른 roleName 들어왔을 경우의 예외 처리
                 }
             } else {
