@@ -44,9 +44,10 @@ public class AuthService {
             throw new BadRequestException(ALREADY_EXIST_NICKNAME);
         }
 
-        String profileImageUrl;
-        if (multipartFile.isEmpty() || multipartFile == null){
-            throw new BadRequestException(FILE_NOT_FOUND);
+        String profileImageUrl = null;
+        if (multipartFile == null){
+            // throw new BadRequestException(FILE_NOT_FOUND);
+            log.info("user profile image is null");
         }
         else {
             profileImageUrl = s3Service.uploadFile(multipartFile);
@@ -72,7 +73,7 @@ public class AuthService {
         Boolean isOptionAgr = socialSignUpRequest.isOptionAgr();
 
         String profileImageUrl = null;
-        if (multipartFile.isEmpty()){
+        if (multipartFile == null){
             // throw new BadRequestException(FILE_NOT_FOUND);
             log.info("user profile image is null");
         }
