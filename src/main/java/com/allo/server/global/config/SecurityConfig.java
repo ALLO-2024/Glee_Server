@@ -58,6 +58,7 @@ public class SecurityConfig {
                         request.requestMatchers(mvcMatcherBuilder.pattern("/users/login")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/login/social")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/signUp")).permitAll()
+                                .requestMatchers(mvcMatcherBuilder.pattern("/users/signUp/social")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/users/signUp/email")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/login/oauth2/code/kakao")).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern("/login/oauth2/code/naver")).permitAll()

@@ -71,9 +71,10 @@ public class AuthService {
         Language language = socialSignUpRequest.language();
         Boolean isOptionAgr = socialSignUpRequest.isOptionAgr();
 
-        String profileImageUrl;
-        if (multipartFile.isEmpty() || multipartFile == null){
-            throw new BadRequestException(FILE_NOT_FOUND);
+        String profileImageUrl = null;
+        if (multipartFile.isEmpty()){
+            // throw new BadRequestException(FILE_NOT_FOUND);
+            log.info("user profile image is null");
         }
         else {
             profileImageUrl = s3Service.uploadFile(multipartFile);
