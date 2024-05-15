@@ -3,7 +3,9 @@ package com.allo.server.domain.lecture.service;
 import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.entity.Lecture;
+import com.allo.server.domain.lecture.repository.CustomLectureRepository;
 import com.allo.server.domain.lecture.repository.LectureRepository;
 import com.allo.server.domain.user.entity.Language;
 import com.allo.server.domain.user.entity.UserEntity;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.allo.server.error.ErrorCode.*;
 
@@ -43,6 +46,7 @@ public class LectureService {
     private final LectureRepository lectureRepository;
     private final UserRepository userRepository;
     private final ContentRepository contentRepository;
+    private final CustomLectureRepository customLectureRepository;
     private final S3Service s3Service;
     private final static String LOCAL_STORAGE_PATH = "/path/to/local/storage/";
 
@@ -156,7 +160,10 @@ public class LectureService {
 
     @Async
     @Transactional
-    public void requestTranslate(Long lectureId) {
+    public void requestTranslate(String email, Long lectureId) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
         Lecture lecture = lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
         Content content = lecture.getContent();
@@ -172,7 +179,7 @@ public class LectureService {
         // 요청 파라미터 및 파일 설정
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("contents", content.getContent());
-        body.add("language", "eng");
+        body.add("language", userEntity.getLanguage().toString());
 
         // HTTP 엔터티 생성
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
@@ -198,5 +205,13 @@ public class LectureService {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("file", fileName);
         return headers;
+    }
+
+    @Transactional
+    public List<LectureSearchResponse> getLecture(String email, int year, int semester) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customLectureRepository.getLectures(userEntity.getUserId(), year, semester);
     }
 }

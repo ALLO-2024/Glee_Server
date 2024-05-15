@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -20,19 +21,20 @@ import static com.allo.server.error.ErrorCode.NOT_AUTHENTICATED_REQUEST;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+//    public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+//        this.objectMapper = objectMapper;
+//    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
         log.info("인증되지 않은 요청입니다.");
-        ErrorResponse errorResponse = ErrorResponse.of(NOT_AUTHENTICATED_REQUEST.getCode(), NOT_AUTHENTICATED_REQUEST.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(NOT_AUTHENTICATED_REQUEST.isSuccess(), NOT_AUTHENTICATED_REQUEST.getCode(), NOT_AUTHENTICATED_REQUEST.getMessage());
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);
 
         response.setContentType("application/json");

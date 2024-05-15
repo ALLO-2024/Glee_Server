@@ -11,6 +11,7 @@ import com.allo.server.domain.word.openapi.GetExampleRequest;
 import com.allo.server.domain.word.openapi.GetExampleResponse;
 import com.allo.server.domain.word.openapi.GetMeanRequest;
 import com.allo.server.domain.word.openapi.GetMeanResponse;
+import com.allo.server.domain.word.repository.CustomWordRepository;
 import com.allo.server.domain.word.repository.WordRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -37,6 +37,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
 import static com.allo.server.error.ErrorCode.*;
@@ -50,6 +51,7 @@ public class WordService {
 
     private final WordRepository wordRepository;
     private final UserRepository userRepository;
+    private final CustomWordRepository customWordRepository;
 
     @Value("${korean-basic-dictionary.key}")
     private String key;
@@ -159,20 +161,16 @@ public class WordService {
         }
     }
 
-    public Page<WordGetResponse> getWord(String email, Pageable pageable){
+    public List<WordGetResponse> getWord(String email, Pageable pageable){
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
         int pageLoc = pageable.getPageNumber() - 1; // page 위치에 있는 값은 0부터 시작한다.
         int pageLimit = 3; // 한페이지에 보여줄 글 개수
 
-        PageRequest pageRequest = PageRequest.of(pageLoc, pageLimit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Word> pages = wordRepository.findAllByUserEntity(userEntity, pageRequest);
-        Page<WordGetResponse> wordGetResponses = pages.map(
-                page -> new WordGetResponse(page.getWord(), page.getMeaning(), page.getPos(), page.getTrans_word(), page.getExample()));
+        PageRequest pageRequest = PageRequest.of(pageLoc, pageLimit);
+        return customWordRepository.getWords(userEntity.getUserId(), pageRequest);
 
-
-        return wordGetResponses;
     }
 
 

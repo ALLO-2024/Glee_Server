@@ -4,6 +4,7 @@ import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
 import com.allo.server.jwt.service.JwtService;
+import com.allo.server.response.BaseResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,12 +56,14 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         jwtService.updateRefreshToken(roleName, id, refreshToken);
 
         // JWT 서비스에서 토큰 정보 가져오기
-        Map<String, String> tokenData = jwtService.sendAccessAndRefreshToken(roleName, accessToken, refreshToken);
+        Map<String, String> tokenData = jwtService.sendAccessAndRefreshToken(accessToken, refreshToken);
 
         // HTTP 응답 설정
         response.setStatus(HttpServletResponse.SC_OK); // 상태 코드를 200 (OK)로 설정
         response.setContentType("application/json");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(tokenData));
+//        response.getWriter().write(new ObjectMapper().writeValueAsString(tokenData));
+        response.getWriter().write(new ObjectMapper().writeValueAsString(new BaseResponse<>(tokenData)));
+
     }
 
     private String extractUsername(Authentication authentication) {
