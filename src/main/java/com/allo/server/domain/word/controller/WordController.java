@@ -40,7 +40,7 @@ public class WordController {
     @Operation(summary = "단어 저장 API")
     @PostMapping("/save")
     public ResponseEntity<BaseResponse> saveWord(@AuthenticationPrincipal UserDetails loginUser,
-                                                 @Valid @RequestPart(value = "WordSaveRequest") WordSaveRequest wordSaveRequest) throws IOException {
+                                                 @Valid @RequestBody WordSaveRequest wordSaveRequest) throws IOException {
 
         wordService.saveWord(loginUser.getUsername(), wordSaveRequest);
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
