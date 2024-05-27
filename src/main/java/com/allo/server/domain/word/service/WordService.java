@@ -37,6 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -159,6 +162,20 @@ public class WordService {
             Word saveWord = WordSaveRequest.wordToEntity(userEntity, wordSaveRequest);
             wordRepository.save(saveWord);
         }
+    }
+
+    public List<WordGetResponse> getAll(String email){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+        List<Word> words = wordRepository.findAllByUserEntity(userEntity);
+
+        List<WordGetResponse> list = new ArrayList<>();
+        for(Word word : words){
+            WordGetResponse response = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getExample());
+            list.add(response);
+        }
+
+        return list;
     }
 
     public List<WordGetResponse> getWord(String email, Pageable pageable){
