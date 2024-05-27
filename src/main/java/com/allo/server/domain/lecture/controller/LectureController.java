@@ -2,6 +2,7 @@ package com.allo.server.domain.lecture.controller;
 
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.service.LectureService;
 import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,10 +49,18 @@ public class LectureController {
 //    }
 
     @Operation(summary = "저장된 강의 조회 API")
-    @GetMapping("/{year}/{semester}")
-    public ResponseEntity<BaseResponse<List<LectureSearchResponse>>> getLectures(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
+    @GetMapping("/get/{lectureId}")
+    public ResponseEntity<BaseResponse<LectureSearchResponse>> getLecture(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long lectureId) {
 
-        List<LectureSearchResponse> response = lectureService.getLecture(loginUser.getUsername(), year, semester);
+        LectureSearchResponse response = lectureService.getLecture(loginUser.getUsername(), lectureId);
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
+
+    @Operation(summary = "년도별 학기별 저장된 강의 조회 API")
+    @GetMapping("/{year}/{semester}")
+    public ResponseEntity<BaseResponse<List<LectureSearchResponseByYearAndSemester>>> getLectures(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
+
+        List<LectureSearchResponseByYearAndSemester> response = lectureService.getLectureByYearAndSemester(loginUser.getUsername(), year, semester);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 

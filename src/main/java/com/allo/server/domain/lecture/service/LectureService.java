@@ -4,6 +4,7 @@ import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.CustomLectureRepository;
 import com.allo.server.domain.lecture.repository.LectureRepository;
@@ -296,10 +297,20 @@ public class LectureService {
     }
 
     @Transactional
-    public List<LectureSearchResponse> getLecture(String email, int year, int semester) {
+    public LectureSearchResponse getLecture(String email, Long lectureId) {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
-        return customLectureRepository.getLectures(userEntity.getUserId(), year, semester);
+        Lecture lecture = lectureRepository.getLectureByUserEntityAndLectureId(userEntity, lectureId);
+
+        return new LectureSearchResponse(lecture.getLectureId(), lecture.getTitle(), lecture.getLectureType(), lecture.getContent().getContent(), lecture.getContent().getTranslatedContent(), lecture.getContent().getSummary());
+    }
+
+    @Transactional
+    public List<LectureSearchResponseByYearAndSemester> getLectureByYearAndSemester(String email, int year, int semester) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customLectureRepository.getLectureByYearAndSemester(userEntity.getUserId(), year, semester);
     }
 }
