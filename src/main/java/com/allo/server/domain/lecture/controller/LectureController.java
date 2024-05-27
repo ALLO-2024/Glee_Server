@@ -6,6 +6,7 @@ import com.allo.server.domain.lecture.service.LectureService;
 import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +30,8 @@ public class LectureController {
 
 
     @Operation(summary = "강의 저장 API")
-    @PostMapping("/save")
+    @PostMapping(value = "/save",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse> saveLecture(@AuthenticationPrincipal UserDetails loginUser,
                                                     @RequestPart(value = "LectureCreateRequest") LectureSaveRequest lectureSaveRequest,
                                                     @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
@@ -38,12 +40,12 @@ public class LectureController {
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 
-    @Operation(summary = "강의 번역 API")
-    @PostMapping("/translate/{lectureId}")
-    public ResponseEntity<BaseResponse> translateLectureContent(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long lectureId) {
-        lectureService.requestTranslate(loginUser.getUsername(), lectureId);
-        return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
-    }
+//    @Operation(summary = "강의 번역 API")
+//    @PostMapping("/translate/{lectureId}")
+//    public ResponseEntity<BaseResponse> translateLectureContent(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long lectureId) {
+//        lectureService.requestTranslate(loginUser.getUsername(), lectureId);
+//        return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
+//    }
 
     @Operation(summary = "저장된 강의 조회 API")
     @GetMapping("/{year}/{semester}")
