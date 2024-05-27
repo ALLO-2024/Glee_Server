@@ -3,6 +3,7 @@ package com.allo.server.domain.content.entity;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +28,25 @@ public class Content extends BaseEntity {
     @Lob
     private String translatedContent;
 
+    @Lob
+    private String summary;
+
+    @ElementCollection
+    private List<String> keywords;
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public void setTranslatedContent(String translatedContent) {
         this.translatedContent = translatedContent;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 }
