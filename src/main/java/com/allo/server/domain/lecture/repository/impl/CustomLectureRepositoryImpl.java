@@ -1,6 +1,7 @@
 package com.allo.server.domain.lecture.repository.impl;
 
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.entity.QLecture;
 import com.allo.server.domain.lecture.repository.CustomLectureRepository;
@@ -22,9 +23,9 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<LectureSearchResponse> getLectures(Long userId, int year, int semester) {
+    public List<LectureSearchResponseByYearAndSemester> getLectureByYearAndSemester(Long userId, int year, int semester) {
         return queryFactory
-                .select(Projections.constructor(LectureSearchResponse.class, lecture.lectureId, lecture.title, lecture.lectureType, lecture.createdAt))
+                .select(Projections.constructor(LectureSearchResponseByYearAndSemester.class, lecture.lectureId, lecture.title, lecture.lectureType, lecture.content.keywords, lecture.createdAt))
                 .from(lecture)
                 .where(lecture.userEntity.userId.eq(userId)
                         .and(lecture.year.eq(year))

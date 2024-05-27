@@ -2,9 +2,12 @@ package com.allo.server.domain.lecture.dto.response;
 
 import com.allo.server.domain.lecture.entity.LectureType;
 
-import java.sql.Timestamp;
+import java.util.List;
 
 public record LectureSearchResponse (Long lectureId, String title,
                                     LectureType lectureType,
-                                    Timestamp createdAt) {
+                                    String Content,
+                                    String translatedContent,
+                                    String summary,
+                                     List<String> keywords) {
 }

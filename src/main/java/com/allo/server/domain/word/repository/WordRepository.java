@@ -16,9 +16,5 @@ import java.util.Optional;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
     Optional<Word> findByUserEntityAndWord(UserEntity userEntity, String word);
-
-//    @Query(value = "select w\n" +
-//            "from Word as w \n" +
-//            "where w.userEntity.userId = :userId")
     List<Word> findAllByUserEntity(UserEntity userEntity);
 }
