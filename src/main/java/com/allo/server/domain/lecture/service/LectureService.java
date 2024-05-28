@@ -4,6 +4,7 @@ import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.CustomLectureRepository;
 import com.allo.server.domain.lecture.repository.LectureRepository;
@@ -14,6 +15,7 @@ import com.allo.server.error.exception.custom.BadRequestException;
 import com.allo.server.global.s3.S3Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -76,9 +78,13 @@ public class LectureService {
         Lecture lecture = LectureSaveRequest.lectureToEntity(userEntity, fileUrl, year, semester, lectureSaveRequest);
         lectureRepository.save(lecture);
 
-        Language language = userEntity.getLanguage();
+        String language = userEntity.getLanguage().toString();
         File file = saveFileInLocal(multipartFile);
-        requestFileToText("eng", lecture.getLectureId(), file);
+        Content content = Content.builder().build();
+        contentRepository.save(content);
+        lecture.setContent(content);
+
+        saveContent("eng", lecture.getLectureId(), file, content, language);
     }
 
     private File saveFileInLocal(MultipartFile multipartFile) throws IOException {
@@ -102,7 +108,7 @@ public class LectureService {
 
     @Async
     @Transactional
-    protected void requestFileToText(String category, Long lectureId, File file) throws IOException {
+    protected void saveContent(String category, Long lectureId, File file, Content content, String language) throws IOException {
         // 대상 서버 URL
         String targetUrl = "http://59.29.138.9:5603/glee/asr";
         RestTemplate restTemplate = new RestTemplate();
@@ -145,14 +151,13 @@ public class LectureService {
         try {
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             String responseContents = jsonNode.get("contents").asText();
-            log.info("Translate SUCCESS: {}", responseBody);
+            log.info("FILE TO TEXT SUCCESS: {}", responseBody);
+            content.setContent(responseContents);
 
-            Lecture lecture = lectureRepository.findById(lectureId)
-                    .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
-
-            Content content = Content.builder().content(responseContents).build();
-            contentRepository.save(content);
-            lecture.setContent(content);
+            // 번역, 요약
+            requestTranslateAndSummary(content, language);
+            // 키워드
+            requestKeywords(content);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,14 +165,7 @@ public class LectureService {
 
     @Async
     @Transactional
-    public void requestTranslate(String email, Long lectureId) {
-
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
-
-        Lecture lecture = lectureRepository.findById(lectureId)
-                .orElseThrow(() -> new BadRequestException(LECTURE_NOT_FOUND));
-        Content content = lecture.getContent();
-
+    public void requestTranslateAndSummary(Content content, String language) {
         // 대상 서버 URL
         String targetUrl = "http://59.29.138.9:5603/glee/translate";
         RestTemplate restTemplate = new RestTemplate();
@@ -179,7 +177,7 @@ public class LectureService {
         // 요청 파라미터 및 파일 설정
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("contents", content.getContent());
-        body.add("language", userEntity.getLanguage().toString());
+        body.add("language", language);
 
         // HTTP 엔터티 생성
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
@@ -195,8 +193,98 @@ public class LectureService {
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
 
-        if (responseBody != null) {
-            content.setTranslatedContent(responseBody);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            // TODO: 리턴형 찾아서 translate에 넣기
+            String responseContents = jsonNode.get("translateContent").asText();
+            log.info("TRANSLATE SUCCESS: {}", responseBody);
+            content.setTranslatedContent(responseContents);
+
+            requestSummary(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    @Transactional
+    public void requestSummary(Content content) {
+        // 대상 서버 URL
+        String targetUrl = "http://59.29.138.9:5603/glee/summary";
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 요청 파라미터 및 파일 설정
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("contents", content.getTranslatedContent());
+
+        // HTTP 엔터티 생성
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // 서버로 POST 요청 전송
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+            targetUrl,
+            HttpMethod.POST,
+            requestEntity,
+            String.class);
+
+        // 응답 확인
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        String responseBody = responseEntity.getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            // TODO: 리턴형 찾아서 translate에 넣기
+            String responseContents = jsonNode.get("summary").asText();
+            log.info("SUMMARY SUCCESS: {}", responseBody);
+            content.setSummary(responseContents);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    @Transactional
+    public void requestKeywords(Content content) {
+        // 대상 서버 URL
+        String targetUrl = "http://59.29.138.9:5603/glee/keyword";
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 요청 파라미터 및 파일 설정
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("contents", content.getContent());
+
+        // HTTP 엔터티 생성
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // 서버로 POST 요청 전송
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+            targetUrl,
+            HttpMethod.POST,
+            requestEntity,
+            String.class);
+
+        // 응답 확인
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        String responseBody = responseEntity.getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            String responseContents = jsonNode.get("keywords").asText();
+            log.info("KEYWORD REQUEST SUCCESS: {}", responseBody);
+            content.setKeywords(responseContents);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -208,10 +296,20 @@ public class LectureService {
     }
 
     @Transactional
-    public List<LectureSearchResponse> getLecture(String email, int year, int semester) {
+    public LectureSearchResponse getLecture(String email, Long lectureId) {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
-        return customLectureRepository.getLectures(userEntity.getUserId(), year, semester);
+        Lecture lecture = lectureRepository.getLectureByUserEntityAndLectureId(userEntity, lectureId);
+
+        return new LectureSearchResponse(lecture.getLectureId(), lecture.getTitle(), lecture.getLectureType(), userEntity.getLanguage(), lecture.getContent().getContent(), lecture.getContent().getTranslatedContent(), lecture.getContent().getSummary(), lecture.getContent().getTranslatedSummary(), lecture.getContent().getKeywords());
+    }
+
+    @Transactional
+    public List<LectureSearchResponseByYearAndSemester> getLectureByYearAndSemester(String email, int year, int semester) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customLectureRepository.getLectureByYearAndSemester(userEntity.getUserId(), year, semester);
     }
 }
