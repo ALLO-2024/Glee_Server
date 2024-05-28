@@ -39,6 +39,8 @@ public class QContent extends EntityPathBase<Content> {
 
     public final StringPath translatedContent = createString("translatedContent");
 
+    public final StringPath translatedSummary = createString("translatedSummary");
+
     //inherited
     public final DateTimePath<java.sql.Timestamp> updatedAt = _super.updatedAt;
 

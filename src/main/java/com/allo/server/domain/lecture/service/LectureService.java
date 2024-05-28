@@ -302,7 +302,7 @@ public class LectureService {
 
         Lecture lecture = lectureRepository.getLectureByUserEntityAndLectureId(userEntity, lectureId);
 
-        return new LectureSearchResponse(lecture.getLectureId(), lecture.getTitle(), lecture.getLectureType(), lecture.getContent().getContent(), lecture.getContent().getTranslatedContent(), lecture.getContent().getSummary(), lecture.getContent().getKeywords());
+        return new LectureSearchResponse(lecture.getLectureId(), lecture.getTitle(), lecture.getLectureType(), userEntity.getLanguage(), lecture.getContent().getContent(), lecture.getContent().getTranslatedContent(), lecture.getContent().getSummary(), lecture.getContent().getTranslatedSummary(), lecture.getContent().getKeywords());
     }
 
     @Transactional

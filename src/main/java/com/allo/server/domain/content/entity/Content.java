@@ -31,6 +31,9 @@ public class Content extends BaseEntity {
     @Lob
     private String summary;
 
+    @Lob
+    private String translatedSummary;
+
     private String keywords;
 
     public void setContent(String content) {
@@ -43,6 +46,10 @@ public class Content extends BaseEntity {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public void setTranslatedSummary(String translatedSummary) {
+        this.translatedSummary = translatedSummary;
     }
 
     public void setKeywords(String keywords) {
