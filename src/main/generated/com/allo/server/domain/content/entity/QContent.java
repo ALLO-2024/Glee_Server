@@ -31,7 +31,7 @@ public class QContent extends EntityPathBase<Content> {
     //inherited
     public final DateTimePath<java.sql.Timestamp> createdAt = _super.createdAt;
 
-    public final ListPath<String, StringPath> keywords = this.<String, StringPath>createList("keywords", String.class, StringPath.class, PathInits.DIRECT2);
+    public final StringPath keywords = createString("keywords");
 
     public final com.allo.server.domain.lecture.entity.QLecture lecture;
 

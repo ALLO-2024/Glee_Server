@@ -6,6 +6,6 @@ import java.util.List;
 
 public record LectureSearchResponseByYearAndSemester (Long lectureId, String title,
                                      LectureType lectureType,
-                                     List<String> keywords,
+                                     String keywords,
                                      Timestamp createdAt) {
 }

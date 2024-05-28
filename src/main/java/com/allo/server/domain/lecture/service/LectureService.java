@@ -281,9 +281,8 @@ public class LectureService {
         try {
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             String responseContents = jsonNode.get("keywords").asText();
-            List<String> keywords = Arrays.asList(responseContents.split(", "));
             log.info("KEYWORD REQUEST SUCCESS: {}", responseBody);
-            content.setKeywords(keywords);
+            content.setKeywords(responseContents);
         } catch (Exception e) {
             e.printStackTrace();
         }

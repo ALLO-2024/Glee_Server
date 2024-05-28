@@ -9,5 +9,5 @@ public record LectureSearchResponse (Long lectureId, String title,
                                     String Content,
                                     String translatedContent,
                                     String summary,
-                                     List<String> keywords) {
+                                     String keywords) {
 }

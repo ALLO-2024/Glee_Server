@@ -1,5 +1,6 @@
 package com.allo.server.domain.lecture.repository.impl;
 
+import com.allo.server.domain.content.entity.QContent;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.entity.Lecture;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.allo.server.domain.content.entity.QContent.content1;
 import static com.allo.server.domain.lecture.entity.QLecture.lecture;
 
 @Repository

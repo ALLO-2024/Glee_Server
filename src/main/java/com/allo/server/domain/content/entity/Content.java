@@ -31,8 +31,7 @@ public class Content extends BaseEntity {
     @Lob
     private String summary;
 
-    @ElementCollection
-    private List<String> keywords;
+    private String keywords;
 
     public void setContent(String content) {
         this.content = content;
@@ -46,7 +45,7 @@ public class Content extends BaseEntity {
         this.summary = summary;
     }
 
-    public void setKeywords(List<String> keywords) {
+    public void setKeywords(String keywords) {
         this.keywords = keywords;
     }
 }
