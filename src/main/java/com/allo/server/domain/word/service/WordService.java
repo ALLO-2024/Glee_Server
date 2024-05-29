@@ -164,14 +164,27 @@ public class WordService {
         }
     }
 
+    public void deleteWord(String email, Long wordId){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        Optional<Word> word = wordRepository.findByUserEntityAndWordId(userEntity, wordId);
+        if (!word.isPresent()) {
+            throw new BadRequestException(NO_EXIST_WORD);
+        }
+        else {
+            wordRepository.deleteById(wordId);
+        }
+    }
+
     public List<WordGetResponse> getAll(String email){
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
-        List<Word> words = wordRepository.findAllByUserEntity(userEntity);
+        List<Word> words = wordRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity);
 
         List<WordGetResponse> list = new ArrayList<>();
         for(Word word : words){
-            WordGetResponse response = new WordGetResponse(word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getExample());
+            WordGetResponse response = new WordGetResponse(word.getWordId(), word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getExample());
             list.add(response);
         }
 

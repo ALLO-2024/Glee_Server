@@ -16,5 +16,6 @@ import java.util.Optional;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
     Optional<Word> findByUserEntityAndWord(UserEntity userEntity, String word);
-    List<Word> findAllByUserEntity(UserEntity userEntity);
+    Optional<Word> findByUserEntityAndWordId(UserEntity userEntity, Long wordId);
+    List<Word> findAllByUserEntityOrderByCreatedAtDesc(UserEntity userEntity);
 }

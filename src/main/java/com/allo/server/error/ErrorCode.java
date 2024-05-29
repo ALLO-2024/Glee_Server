@@ -32,7 +32,8 @@ public enum ErrorCode {
     UNKNOWN_LECTURE_SUBJECT(false,3003, "lectureSubject 값이 HUMANITY, SOCIAL, EDUCATION, SCIENCE, ENTERTAINMENT와 CULTURE가 아닙니다."),
 
     UNKNOWN_WORD(false,4000, "word 값이 한국어 기초사전에 존재하지 않는 단어 입니다."),
-    ALREADY_EXIST_WORD(false,4001, "이미 존재하는 단어 입니다.")
+    ALREADY_EXIST_WORD(false,4001, "이미 존재하는 단어 입니다."),
+    NO_EXIST_WORD(false,4001, "존재하지 않는 단어 입니다.")
 
 
     ;

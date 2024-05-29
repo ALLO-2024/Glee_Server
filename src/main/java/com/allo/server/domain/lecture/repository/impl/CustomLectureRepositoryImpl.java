@@ -1,10 +1,6 @@
 package com.allo.server.domain.lecture.repository.impl;
 
-import com.allo.server.domain.content.entity.QContent;
-import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
-import com.allo.server.domain.lecture.entity.Lecture;
-import com.allo.server.domain.lecture.entity.QLecture;
 import com.allo.server.domain.lecture.repository.CustomLectureRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -14,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.allo.server.domain.content.entity.QContent.content1;
 import static com.allo.server.domain.lecture.entity.QLecture.lecture;
 
 @Repository
@@ -27,7 +22,12 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     @Override
     public List<LectureSearchResponseByYearAndSemester> getLectureByYearAndSemester(Long userId, int year, int semester) {
         return queryFactory
-                .select(Projections.constructor(LectureSearchResponseByYearAndSemester.class, lecture.lectureId, lecture.title, lecture.lectureType, lecture.content.keywords, lecture.createdAt))
+                .select(Projections.constructor(LectureSearchResponseByYearAndSemester.class,
+                        lecture.lectureId,
+                        lecture.title,
+                        lecture.lectureType,
+                        lecture.content.keywords,
+                        lecture.createdAt.stringValue().substring(0, 16))) // Timestamp를 문자열로 변환하여 yyyy-MM-dd HH:mm 형식으로 잘라서 사용
                 .from(lecture)
                 .where(lecture.userEntity.userId.eq(userId)
                         .and(lecture.year.eq(year))
