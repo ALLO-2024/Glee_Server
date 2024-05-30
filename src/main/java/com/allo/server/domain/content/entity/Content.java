@@ -49,11 +49,13 @@ public class Content extends BaseEntity {
         this.summary = summary;
     }
 
-    public void setTranslatedSummary(String translatedSummary) {
-        this.translatedSummary = translatedSummary;
-    }
+    public void setTranslatedSummary(String translatedSummary) { this.translatedSummary = translatedSummary; }
 
     public void setKeywords(String keywords) {
         this.keywords = keywords;
+    }
+
+    public Content(Lecture lecture) {
+        this.lecture = lecture;
     }
 }
