@@ -20,6 +20,7 @@ public class Content extends BaseEntity {
     private Long contentId;
 
     @OneToOne
+    @JoinColumn(name = "lecture_id")
     private Lecture lecture;
 
     @Column(columnDefinition = "TEXT")
