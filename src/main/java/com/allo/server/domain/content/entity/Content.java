@@ -20,18 +20,19 @@ public class Content extends BaseEntity {
     private Long contentId;
 
     @OneToOne
+    @JoinColumn(name = "lecture_id")
     private Lecture lecture;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String translatedContent;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String translatedSummary;
 
     private String keywords;

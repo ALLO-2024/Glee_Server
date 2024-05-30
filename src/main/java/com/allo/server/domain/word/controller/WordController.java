@@ -47,6 +47,14 @@ public class WordController {
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 
+    @Operation(summary = "단어 삭제 API")
+    @DeleteMapping("/delete/{wordId}")
+    public ResponseEntity<BaseResponse> deleteWord(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long wordId) throws IOException {
+
+        wordService.deleteWord(loginUser.getUsername(), wordId);
+        return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
+    }
+
     @Operation(summary = "저장된 모든 단어 검색 API")
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<List<WordGetResponse>>> getAll(@AuthenticationPrincipal UserDetails loginUser) throws IOException {

@@ -16,6 +16,11 @@ import com.allo.server.global.s3.S3Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -84,15 +89,18 @@ public class LectureService {
         contentRepository.save(content);
         lecture.setContent(content);
 
-        saveContent("eng", lecture.getLectureId(), file, content, language);
+         saveContent("eng", lecture.getLectureId(), file, content, language);
     }
 
     private File saveFileInLocal(MultipartFile multipartFile) throws IOException {
         // 원본 파일명
         String originalFileName = multipartFile.getOriginalFilename();
+        UUID fileNameUUID = UUID.randomUUID();
+        String extenstion = Objects.requireNonNull(originalFileName).split("\\.")[1];
+
 
         // 로컬 저장 경로에 저장할 파일 객체 생성
-        File localFile = new File(LOCAL_STORAGE_PATH + originalFileName);
+        File localFile = new File(LOCAL_STORAGE_PATH + fileNameUUID + "." + extenstion);
         localFile.getParentFile().mkdirs();
 
         // MultipartFile의 InputStream을 사용하여 파일을 로컬에 저장
@@ -154,10 +162,12 @@ public class LectureService {
             log.info("FILE TO TEXT SUCCESS: {}", responseBody);
             content.setContent(responseContents);
 
-            // 번역, 요약
-            requestTranslateAndSummary(content, language);
+            // 한국어 요약
+            requestSummary(content, responseContents, false);
             // 키워드
             requestKeywords(content);
+            // 번역, 번역 요약
+            requestContentInfo(content, language);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,43 +175,38 @@ public class LectureService {
 
     @Async
     @Transactional
-    public void requestTranslateAndSummary(Content content, String language) {
-        // 대상 서버 URL
-        String targetUrl = "http://59.29.138.9:5603/glee/translate";
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 헤더 설정
+    public void requestContentInfo(Content content, String language) {
+        String url = "http://59.29.138.9:5603/glee/translate";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        // 요청 파라미터 및 파일 설정
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("contents", content.getContent());
-        body.add("language", language);
 
-        // HTTP 엔터티 생성
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        String requestBody = "{\"contents\":\"" + content.getContent() + "\",\"language\":\"" + language + "\"}";
 
-        // 서버로 POST 요청 전송
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
-                targetUrl,
-                HttpMethod.POST,
-                requestEntity,
-                String.class);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        RestTemplate restTemplate = new RestTemplate();
 
-        // 응답 확인
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
-            // TODO: 리턴형 찾아서 translate에 넣기
-            String responseContents = jsonNode.get("translateContent").asText();
-            log.info("TRANSLATE SUCCESS: {}", responseBody);
-            content.setTranslatedContent(responseContents);
+            Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+            Matcher matcher = pattern.matcher(responseBody);
 
-            requestSummary(content);
+            if (matcher.find()) {
+                String extractedText = matcher.group(1);
+                String translated = extractedText.substring(2, extractedText.length() - 2);
+                log.info("TRANSLATE SUCCESS: {}", translated);
+                content.setTranslatedContent(translated);
+
+                // 요약 요청
+                requestSummary(content, translated, true);
+            } else {
+                log.info("Translated array is empty or not found.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,40 +214,37 @@ public class LectureService {
 
     @Async
     @Transactional
-    public void requestSummary(Content content) {
-        // 대상 서버 URL
-        String targetUrl = "http://59.29.138.9:5603/glee/summary";
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 헤더 설정
+    public void requestSummary(Content content, String reqString, boolean isTranslated) {
+        String url = "http://59.29.138.9:5603/glee/summary";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        // 요청 파라미터 및 파일 설정
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("contents", content.getTranslatedContent());
+        String requestBody = "{\"contents\":\"" + reqString + "\"}";
 
-        // HTTP 엔터티 생성
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        RestTemplate restTemplate = new RestTemplate();
 
-        // 서버로 POST 요청 전송
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
-            targetUrl,
-            HttpMethod.POST,
-            requestEntity,
-            String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-        // 응답 확인
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
-            // TODO: 리턴형 찾아서 translate에 넣기
-            String responseContents = jsonNode.get("summary").asText();
-            log.info("SUMMARY SUCCESS: {}", responseBody);
-            content.setSummary(responseContents);
+            String extractedText = responseBody.substring(17, responseBody.length() - 4);
+            if (!extractedText.isEmpty()) {
+                if (isTranslated) {
+                    log.info("TRANSLATED Summary SUCCESS: {}", responseBody);
+                    log.info("Extracted text: {}", extractedText);
+                    content.setTranslatedSummary(extractedText);
+                } else {
+                    log.info("KOREAN Summary SUCCESS: {}", responseBody);
+                    log.info("Extracted text: {}", extractedText);
+                    content.setSummary(extractedText);
+                }
+            } else {
+                log.info("Summary field is not found.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,38 +253,30 @@ public class LectureService {
     @Async
     @Transactional
     public void requestKeywords(Content content) {
-        // 대상 서버 URL
-        String targetUrl = "http://59.29.138.9:5603/glee/keyword";
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 헤더 설정
+        String url = "http://59.29.138.9:5603/glee/keyword";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        // 요청 파라미터 및 파일 설정
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("contents", content.getContent());
+        String requestBody = "{\"contents\":\"" + content.getContent() + "\"}";
 
-        // HTTP 엔터티 생성
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        RestTemplate restTemplate = new RestTemplate();
 
-        // 서버로 POST 요청 전송
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
-            targetUrl,
-            HttpMethod.POST,
-            requestEntity,
-            String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-        // 응답 확인
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         String responseBody = responseEntity.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
-            String responseContents = jsonNode.get("keywords").asText();
-            log.info("KEYWORD REQUEST SUCCESS: {}", responseBody);
-            content.setKeywords(responseContents);
+            String extractedText = responseBody.substring(17, responseBody.length() - 4);
+            if (!extractedText.isEmpty()) {
+                log.info("KEYWORD SUCCESS: {}", responseBody);
+                log.info("Extracted text: {}", extractedText);
+                content.setKeywords(extractedText);
+            } else {
+                log.info("Summary field is not found.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
