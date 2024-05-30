@@ -85,7 +85,7 @@ public class LectureService {
 
         String language = userEntity.getLanguage().toString();
         File file = saveFileInLocal(multipartFile);
-        Content content = Content.builder().build();
+        Content content = new Content(lecture);
         contentRepository.save(content);
         lecture.setContent(content);
 
