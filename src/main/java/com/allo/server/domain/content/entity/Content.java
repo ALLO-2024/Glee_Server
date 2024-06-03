@@ -19,8 +19,8 @@ public class Content extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long contentId;
 
-    @OneToOne
-    @JoinColumn(name = "lecture_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecture_id", nullable = false)
     private Lecture lecture;
 
     @Column(columnDefinition = "TEXT")
