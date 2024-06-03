@@ -59,6 +59,9 @@ dependencies {
 	// XML -> JSON
 	implementation group: 'org.json', name: 'json', version: '20220320'
 
+	// GSON
+	implementation 'com.google.code.gson:gson:2.8.9'  // 사용하고 싶은 버전으로 교체
+
 	//querydsl
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
