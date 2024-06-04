@@ -1,5 +1,6 @@
 package com.allo.server.domain.oauth.service;
 
+import com.allo.server.domain.oauth.dto.request.SocialLoginCodeRequest;
 import com.allo.server.domain.oauth.dto.request.SocialLoginRequest;
 import com.allo.server.domain.oauth.dto.response.LoginResponse;
 import com.allo.server.domain.oauth.dto.response.OAuthInfoResponse;
@@ -13,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +40,46 @@ public class OAuthService {
     private final RequestOAuthInfoService requestOAuthInfoService;
     private final JwtService jwtService;
 
-    public String getKakaoAccessToken (String authorize_code) {
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String KAKAO_CLIENT_ID;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String KAKAO_CLIENT_SECRET;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String KAKAO_REDIRECT_URI;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String NAVER_CLIENT_ID;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String NAVER_CLIENT_SECRET;
+
+    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
+    private String NAVER_REDIRECT_URI;
+
+    public String getAccessToken (SocialLoginCodeRequest codeRequest) {
+
         String access_Token = "";
         String refresh_Token = "";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
+        String client_id = "";
+        String client_secret = "";
+        String redirect_uri = "";
+        String reqURL = "";
+        String authorize_code = codeRequest.code();
+
+        if (codeRequest.provider().equals(SocialType.KAKAO)) {
+            client_id = KAKAO_CLIENT_ID;
+            client_secret = KAKAO_CLIENT_SECRET;
+            redirect_uri = KAKAO_REDIRECT_URI;
+            reqURL = "https://kauth.kakao.com/oauth/token";
+        }
+        else if (codeRequest.provider().equals(SocialType.NAVER)) {
+            client_id = NAVER_CLIENT_ID;
+            client_secret = NAVER_CLIENT_SECRET;
+            redirect_uri = NAVER_REDIRECT_URI;
+            reqURL = "https://nid.naver.com/oauth2.0/token";
+        }
 
         try {
             URL url = new URL(reqURL);
@@ -60,9 +98,13 @@ public class OAuthService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
 
-            sb.append("&client_secret=2kXpvylKIQGlla2NpwsubvcXuT69oZeu"); //본인이 발급받은 key
-            sb.append("&client_id=035418fdb6f6407a514687527eb144ca"); //본인이 발급받은 key
-            sb.append("&redirect_uri=http://3.39.204.115:8080/login/oauth2/code/kakao"); // 본인이 설정한 주소
+            sb.append("&client_secret=" + client_secret); //본인이 발급받은 key
+            sb.append("&client_id=" + client_id); //본인이 발급받은 key
+            sb.append("&redirect_uri=" + redirect_uri); // 본인이 설정한 주소
+
+            if (codeRequest.provider().equals(SocialType.NAVER)) {
+                sb.append("&state=null");
+            }
 
             sb.append("&code=" + authorize_code);
             bw.write(sb.toString());
@@ -97,6 +139,7 @@ public class OAuthService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return access_Token;
     }
 
