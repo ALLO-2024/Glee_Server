@@ -15,6 +15,7 @@ public enum ErrorCode {
     NOT_ALLOWED_MEMBER(false,2005, "해당 요청에 대한 권한이 없습니다."),
     NOT_AUTHENTICATED_REQUEST(false,2006, "유효한 JWT 토큰이 없습니다."),
     FILE_NOT_FOUND(false,2007, "파일이 존재하지 않습니다."),
+    FAIL_OAUTH_TOKEN(false,2008, "OAuth token 을 구하지 못했습니다.."),
 
     USER_NOT_FOUND(false,2008, "사용자를 찾을 수 없습니다."),
     INVALID_ROLE_NAME(false,2009, "유효한 ROLE_NAME 이 없습니다."),
