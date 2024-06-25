@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,4 +37,11 @@ public class Comment extends BaseEntity {
 
   @Column(columnDefinition = "TEXT")
   private String content;
+
+  @Builder
+  public Comment(UserEntity userEntity, Post post, String content) {
+    this.userEntity = userEntity;
+    this.post = post;
+    this.content = content;
+  }
 }
