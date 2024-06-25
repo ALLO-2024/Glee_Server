@@ -13,6 +13,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +35,11 @@ public class Post extends BaseEntity {
 
   @Column(columnDefinition = "TEXT")
   private String content;
+
+  @Builder
+  public Post(UserEntity userEntity, String title, String content) {
+    this.userEntity = userEntity;
+    this.title = title;
+    this.content = content;
+  }
 }
