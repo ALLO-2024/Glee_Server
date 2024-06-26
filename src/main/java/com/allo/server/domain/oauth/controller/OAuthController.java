@@ -22,10 +22,7 @@ public class OAuthController {
 
     @Operation(summary = "소셜 로그인 API")
     @PostMapping("/users/login/social")
-    public ResponseEntity<BaseResponse<LoginResponse>> userSocialLogin(@RequestBody @Valid SocialLoginCodeRequest codeRequest) {
-        String accessToken = null;
-        accessToken = oAuthService.getAccessToken(codeRequest);
-        SocialLoginRequest request = new SocialLoginRequest(accessToken, codeRequest.provider());
+    public ResponseEntity<BaseResponse<LoginResponse>> userSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         LoginResponse response = oAuthService.userSocialLogin(request);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
