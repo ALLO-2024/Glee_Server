@@ -16,9 +16,9 @@ import java.io.IOException;
 public class TestController {
     private final S3Service s3Service;
 
-    @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        String fileName = s3Service.uploadFile(multipartFile);
-        return fileName;
-    }
+//    @PostMapping("/upload")
+//    public String upload(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+//        String fileName = s3Service.uploadFile(multipartFile);
+//        return fileName;
+//    }
 }
