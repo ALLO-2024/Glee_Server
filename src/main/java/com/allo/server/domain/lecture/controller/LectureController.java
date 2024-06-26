@@ -2,6 +2,7 @@ package com.allo.server.domain.lecture.controller;
 
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByPartialTitle;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.service.LectureService;
 import com.allo.server.response.BaseResponse;
@@ -58,9 +59,17 @@ public class LectureController {
 
     @Operation(summary = "년도별 학기별 저장된 강의 조회 API")
     @GetMapping("/{year}/{semester}")
-    public ResponseEntity<BaseResponse<List<LectureSearchResponseByYearAndSemester>>> getLectures(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
+    public ResponseEntity<BaseResponse<List<LectureSearchResponseByYearAndSemester>>> getLecturesByYearAndSemester(@AuthenticationPrincipal UserDetails loginUser, @PathVariable int year, @PathVariable int semester) {
 
         List<LectureSearchResponseByYearAndSemester> response = lectureService.getLectureByYearAndSemester(loginUser.getUsername(), year, semester);
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
+
+    @Operation(summary = "일부 제목으로 저장된 강의 조회 API")
+    @GetMapping("/{partialTitle}")
+    public ResponseEntity<BaseResponse<List<LectureSearchResponseByPartialTitle>>> getLecturesByPartialTitle (@AuthenticationPrincipal UserDetails loginUser, @PathVariable String partialTitle) {
+
+        List<LectureSearchResponseByPartialTitle> response = lectureService.findLecturesByTitleContaining(loginUser.getUsername(), partialTitle);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 

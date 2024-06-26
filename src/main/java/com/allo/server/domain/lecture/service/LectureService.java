@@ -4,6 +4,7 @@ import com.allo.server.domain.content.entity.Content;
 import com.allo.server.domain.content.repository.ContentRepository;
 import com.allo.server.domain.lecture.dto.request.LectureSaveRequest;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByPartialTitle;
 import com.allo.server.domain.lecture.dto.response.LectureSearchResponseByYearAndSemester;
 import com.allo.server.domain.lecture.entity.Lecture;
 import com.allo.server.domain.lecture.repository.CustomLectureRepository;
@@ -15,10 +16,13 @@ import com.allo.server.error.exception.custom.BadRequestException;
 import com.allo.server.global.s3.S3Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
@@ -68,7 +72,8 @@ public class LectureService {
             throw new BadRequestException(FILE_NOT_FOUND);
         }
         else {
-            fileUrl = s3Service.uploadFile(multipartFile);
+            CompletableFuture<URL> future = s3Service.uploadFile(multipartFile);
+            fileUrl = future.thenApply(URL::toString).join();
         }
 
         LocalDate localDate = LocalDate.now();
@@ -305,5 +310,13 @@ public class LectureService {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
         return customLectureRepository.getLectureByYearAndSemester(userEntity.getUserId(), year, semester);
+    }
+
+    @Transactional
+    public List<LectureSearchResponseByPartialTitle> findLecturesByTitleContaining(String email, String title) {
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customLectureRepository.findLecturesByTitleContaining(userEntity.getUserId(), title);
     }
 }

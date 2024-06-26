@@ -4,6 +4,7 @@ import com.allo.server.domain.oauth.dto.request.SocialLoginCodeRequest;
 import com.allo.server.domain.oauth.dto.request.SocialLoginRequest;
 import com.allo.server.domain.oauth.dto.response.LoginResponse;
 import com.allo.server.domain.oauth.service.OAuthService;
+import com.allo.server.domain.user.entity.SocialType;
 import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -21,9 +22,7 @@ public class OAuthController {
 
     @Operation(summary = "소셜 로그인 API")
     @PostMapping("/users/login/social")
-    public ResponseEntity<BaseResponse<LoginResponse>> userSocialLogin(@RequestBody @Valid SocialLoginCodeRequest codeRequest) {
-        String accessToken = oAuthService.getKakaoAccessToken(codeRequest.code());
-        SocialLoginRequest request = new SocialLoginRequest(accessToken, codeRequest.provider());
+    public ResponseEntity<BaseResponse<LoginResponse>> userSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         LoginResponse response = oAuthService.userSocialLogin(request);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }

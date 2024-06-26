@@ -65,7 +65,7 @@ public class WordService {
         Optional<Word> existWord = wordRepository.findByUserEntityAndWord(userEntity, word);
 
         if (existWord.isPresent()) {
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getExample(), Boolean.TRUE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getExample(), Boolean.TRUE, existWord.get().getWordId());
             return wordSearchResponse;
         }
         else {
@@ -144,7 +144,7 @@ public class WordService {
             String trans_word = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_word();
             String example = getExampleResponse.getChannel().getItem().get(0).getExample();
 
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, example, Boolean.FALSE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, example, Boolean.FALSE, 0L);
 
             return wordSearchResponse;
         }
