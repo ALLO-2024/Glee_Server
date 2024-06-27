@@ -27,7 +27,6 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
     public PostInfoResponse getPost(Long postId) {
         PostInfoResponse response = queryFactory
                 .select(Projections.constructor(PostInfoResponse.class,
-                        post.userEntity.userId,
                         post.userEntity.nickname,
                         post.userEntity.profileImageUrl,
                         post.createdAt.stringValue().substring(0, 16),
