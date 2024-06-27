@@ -1,6 +1,7 @@
 package com.allo.server.domain.comment.service;
 
 import com.allo.server.domain.comment.dto.request.CommentSaveRequest;
+import com.allo.server.domain.comment.dto.response.CommentSaveResponse;
 import com.allo.server.domain.comment.entity.Comment;
 import com.allo.server.domain.comment.repository.CommentRepository;
 import com.allo.server.domain.post.entity.Post;
@@ -26,7 +27,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    public void saveComment(String email, CommentSaveRequest commentSaveRequest){
+    public CommentSaveResponse saveComment(String email, CommentSaveRequest commentSaveRequest){
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
@@ -42,6 +43,8 @@ public class CommentService {
 
         Comment comment = new Comment(userEntity, post, commentSaveRequest.content(), parentComment);
         commentRepository.save(comment);
+
+        return new CommentSaveResponse(userEntity.getNickname(), userEntity.getProfileImageUrl(), commentSaveRequest.content(), comment.getCreatedAt().toString().substring(0, 16));
     }
 
 }
