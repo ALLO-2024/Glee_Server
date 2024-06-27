@@ -12,6 +12,7 @@ import com.allo.server.domain.post_image.dto.response.PostImageGetResponse;
 import com.allo.server.domain.post_image.entity.PostImage;
 import com.allo.server.domain.post_image.repository.CustomPostImageRepository;
 import com.allo.server.domain.post_image.repository.PostImageRepository;
+import com.allo.server.domain.post_like.repository.PostLikeRepository;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
@@ -40,8 +41,8 @@ public class PostService {
     private final CustomPostRepository customPostRepository;
     private final PostImageRepository postImageRepository;
     private final CustomPostImageRepository customPostImageRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
-    private final CommentService commentService;
     private final S3Service s3Service;
 
     public void savePost(String email, PostSaveRequest request, List<MultipartFile> multipartFiles) throws IOException {
@@ -69,11 +70,11 @@ public class PostService {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException(POST_NOT_FOUND));
 
-        PostInfoResponse postInfoResponse = customPostRepository.getPost(postId);
-        List<PostImageGetResponse> postImageGetResponses = customPostImageRepository.getPostImages(postId);
-        List<CommentGetResponse> commentGetResponses = commentService.getComments(email, postId);
+        PostInfoResponse postInfoResponse = customPostRepository.getPost(userEntity.getUserId(), postId);
 
-        return PostGetResponse.of(postInfoResponse, postImageGetResponses,commentGetResponses);
+        List<PostImageGetResponse> postImageGetResponses = customPostImageRepository.getPostImages(postId);
+
+        return PostGetResponse.of(postInfoResponse, postImageGetResponses);
     }
 
 }

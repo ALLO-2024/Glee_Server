@@ -24,7 +24,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PostInfoResponse getPost(Long postId) {
+    public PostInfoResponse getPost(Long userId, Long postId) {
         PostInfoResponse response = queryFactory
                 .select(Projections.constructor(PostInfoResponse.class,
                         post.userEntity.nickname,
@@ -37,7 +37,12 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                                 .where(postLike.post.postId.eq(post.postId)),
                         JPAExpressions.select(comment.count())
                                 .from(comment)
-                                .where(comment.post.postId.eq(post.postId))
+                                .where(comment.post.postId.eq(post.postId)),
+                        JPAExpressions.selectOne()
+                                .from(postLike)
+                                .where(postLike.userEntity.userId.eq(userId)
+                                        .and(postLike.post.postId.eq(postId)))
+                                .exists()
                 ))
                 .from(post)
                 .where(post.postId.eq(postId))
