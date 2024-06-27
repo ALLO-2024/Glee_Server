@@ -36,9 +36,9 @@ public enum ErrorCode {
     ALREADY_EXIST_WORD(false,4001, "이미 존재하는 단어 입니다."),
     NO_EXIST_WORD(false,4001, "존재하지 않는 단어 입니다."),
 
-    POST_NOT_FOUND(false, 5000, "해당 id의 post를 찾을 수 없습니다.")
+    POST_NOT_FOUND(false, 5000, "해당 id의 post를 찾을 수 없습니다."),
 
-
+    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다.")
     ;
 
     private final boolean isSuccess;

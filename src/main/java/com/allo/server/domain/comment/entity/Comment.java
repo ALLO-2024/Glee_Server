@@ -3,19 +3,15 @@ package com.allo.server.domain.comment.entity;
 import com.allo.server.domain.post.entity.Post;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,10 +34,15 @@ public class Comment extends BaseEntity {
   @Column(columnDefinition = "TEXT")
   private String content;
 
+  @ManyToOne
+  @JoinColumn(name = "parent_id")
+  private Comment parentComment; //부모 댓글
+
   @Builder
-  public Comment(UserEntity userEntity, Post post, String content) {
+  public Comment(UserEntity userEntity, Post post, String content, Comment parentComment) {
     this.userEntity = userEntity;
     this.post = post;
     this.content = content;
+    this.parentComment = parentComment;
   }
 }
