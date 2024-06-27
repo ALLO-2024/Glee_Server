@@ -5,6 +5,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import java.sql.Time;
+import java.time.LocalTime;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,7 @@ public class S3Service {
     public CompletableFuture<URL> uploadFile(MultipartFile multipartFile) throws IOException {
 
         CompletableFuture<URL> future = new CompletableFuture<>();
+        System.out.println("start: " + Thread.currentThread().getId() + "Time: " + LocalTime.now());
 
         String fileName = multipartFile.getOriginalFilename();
         UUID fileNameUUID = UUID.randomUUID();
@@ -59,6 +63,7 @@ public class S3Service {
         } catch (AmazonServiceException e) {
             e.printStackTrace();
         }
+        System.out.println("end: " + Thread.currentThread().getId() + "Time: " + LocalTime.now());
 
         //파일 주소 리턴
         future.complete(amazonS3.getUrl(bucket, fileName));
