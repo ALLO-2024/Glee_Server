@@ -1,6 +1,7 @@
 package com.allo.server.domain.comment.controller;
 
 import com.allo.server.domain.comment.dto.request.CommentSaveRequest;
+import com.allo.server.domain.comment.dto.response.CommentGetResponse;
 import com.allo.server.domain.comment.dto.response.CommentSaveResponse;
 import com.allo.server.domain.comment.service.CommentService;
 import com.allo.server.domain.post.dto.request.PostSaveRequest;
@@ -31,9 +32,17 @@ public class CommentController {
 
     @Operation(summary = "댓글 작성 API")
     @PostMapping("/save")
-    public ResponseEntity<BaseResponse<CommentSaveResponse>> saveWord(@AuthenticationPrincipal UserDetails loginUser, @Valid @RequestBody CommentSaveRequest commentSaveRequest) throws IOException {
+    public ResponseEntity<BaseResponse<CommentSaveResponse>> saveWord(@AuthenticationPrincipal UserDetails loginUser, @Valid @RequestBody CommentSaveRequest commentSaveRequest){
 
         CommentSaveResponse response = commentService.saveComment(loginUser.getUsername(), commentSaveRequest);
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
+
+    @Operation(summary = "댓글 조회 API")
+    @GetMapping("/get/{postId}")
+    public ResponseEntity<BaseResponse<List<CommentGetResponse>>> getComments(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long postId){
+
+        List<CommentGetResponse> response = commentService.getComments(loginUser.getUsername(), postId);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 }
