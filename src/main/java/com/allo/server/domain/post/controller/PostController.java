@@ -1,6 +1,9 @@
 package com.allo.server.domain.post.controller;
 
+import com.allo.server.domain.lecture.dto.response.LectureSearchResponse;
 import com.allo.server.domain.post.dto.request.PostSaveRequest;
+import com.allo.server.domain.post.dto.response.PostGetResponse;
+import com.allo.server.domain.post.dto.response.PostInfoResponse;
 import com.allo.server.domain.post.service.PostService;
 import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,5 +35,13 @@ public class PostController {
             @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) throws IOException {
         postService.savePost(loginUser.getUsername(), request, multipartFiles);
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
+    }
+
+    @Operation(summary = "저장된 게시물 조회 API")
+    @GetMapping("/get/{postId}")
+    public ResponseEntity<BaseResponse<PostGetResponse>> getPost(@AuthenticationPrincipal UserDetails loginUser, @PathVariable Long postId) {
+
+        PostGetResponse response = postService.getPost(loginUser.getUsername(), postId);
+        return ResponseEntity.ok(new BaseResponse<>(response));
     }
 }

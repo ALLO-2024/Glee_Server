@@ -1,10 +1,18 @@
 package com.allo.server.domain.post.service;
 
+import com.allo.server.domain.comment.dto.response.CommentGetResponse;
+import com.allo.server.domain.comment.service.CommentService;
 import com.allo.server.domain.post.dto.request.PostSaveRequest;
+import com.allo.server.domain.post.dto.response.PostGetResponse;
+import com.allo.server.domain.post.dto.response.PostInfoResponse;
 import com.allo.server.domain.post.entity.Post;
+import com.allo.server.domain.post.repository.CustomPostRepository;
 import com.allo.server.domain.post.repository.PostRepository;
+import com.allo.server.domain.post_image.dto.response.PostImageGetResponse;
 import com.allo.server.domain.post_image.entity.PostImage;
+import com.allo.server.domain.post_image.repository.CustomPostImageRepository;
 import com.allo.server.domain.post_image.repository.PostImageRepository;
+import com.allo.server.domain.post_like.repository.PostLikeRepository;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
@@ -21,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static com.allo.server.error.ErrorCode.USER_NOT_FOUND;
+import static com.allo.server.error.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +38,10 @@ import static com.allo.server.error.ErrorCode.USER_NOT_FOUND;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CustomPostRepository customPostRepository;
     private final PostImageRepository postImageRepository;
+    private final CustomPostImageRepository customPostImageRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
@@ -52,6 +63,18 @@ public class PostService {
                 postImageRepository.save(postImage);
             }).join();  // 이 작업은 현재 스레드를 블록하며 모든 이미지가 처리될 때까지 기다림
         });
+    }
+
+    public PostGetResponse getPost(String email, Long postId) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException(POST_NOT_FOUND));
+
+        PostInfoResponse postInfoResponse = customPostRepository.getPost(userEntity.getUserId(), postId);
+
+        List<PostImageGetResponse> postImageGetResponses = customPostImageRepository.getPostImages(postId);
+
+        return PostGetResponse.of(postInfoResponse, postImageGetResponses);
     }
 
 }

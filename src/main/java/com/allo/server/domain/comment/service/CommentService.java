@@ -50,7 +50,7 @@ public class CommentService {
         Comment comment = new Comment(userEntity, post, commentSaveRequest.content(), parentComment);
         commentRepository.save(comment);
 
-        return new CommentSaveResponse(userEntity.getNickname(), userEntity.getProfileImageUrl(), commentSaveRequest.content(), comment.getCreatedAt().toString().substring(0, 16));
+        return new CommentSaveResponse(userEntity.getUserId(), userEntity.getNickname(), userEntity.getProfileImageUrl(), commentSaveRequest.content(), comment.getCreatedAt().toString().substring(0, 16));
     }
 
     public List<CommentGetResponse> getComments(String email, Long postId){
@@ -65,15 +65,12 @@ public class CommentService {
                         response.profileImageUrl(),
                         response.content(),
                         response.createdAt(),
-                        isCurrentUser(response.nickname(), userEntity.getUserId())
+                        isCurrentUser(response.userId(), userEntity.getUserId())
                 ))
                 .collect(Collectors.toList());
     }
 
-    private Boolean isCurrentUser(String nickname, Long userId) {
-        UserEntity userEntity = userRepository.findByNickname(nickname).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
-        return userEntity.getUserId().equals(userId);
+    private Boolean isCurrentUser(Long responseUserId, Long userId) {
+        return responseUserId.equals(userId);
     }
-
-
 }
