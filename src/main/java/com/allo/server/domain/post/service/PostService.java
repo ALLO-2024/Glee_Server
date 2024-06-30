@@ -1,10 +1,9 @@
 package com.allo.server.domain.post.service;
 
-import com.allo.server.domain.comment.dto.response.CommentGetResponse;
-import com.allo.server.domain.comment.service.CommentService;
 import com.allo.server.domain.post.dto.request.PostSaveRequest;
 import com.allo.server.domain.post.dto.response.PostGetResponse;
 import com.allo.server.domain.post.dto.response.PostInfoResponse;
+import com.allo.server.domain.post.dto.response.PostListGetResponse;
 import com.allo.server.domain.post.entity.Post;
 import com.allo.server.domain.post.repository.CustomPostRepository;
 import com.allo.server.domain.post.repository.PostRepository;
@@ -75,6 +74,12 @@ public class PostService {
         List<PostImageGetResponse> postImageGetResponses = customPostImageRepository.getPostImages(postId);
 
         return PostGetResponse.of(postInfoResponse, postImageGetResponses);
+    }
+
+    public List<PostListGetResponse> getPostList(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customPostRepository.getPostList();
     }
 
 }
