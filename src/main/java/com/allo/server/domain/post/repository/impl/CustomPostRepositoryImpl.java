@@ -3,6 +3,7 @@ package com.allo.server.domain.post.repository.impl;
 import com.allo.server.domain.post.dto.response.PostInfoResponse;
 import com.allo.server.domain.post.dto.response.PostListGetResponse;
 import com.allo.server.domain.post.repository.CustomPostRepository;
+import com.allo.server.domain.post_like.entity.QPostLike;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -111,6 +112,37 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
         ))
         .from(post)
         .where(post.userEntity.userId.eq(userId))
+        .orderBy(post.createdAt.desc())
+        .fetch();
+  }
+
+  @Override
+  public List<PostListGetResponse> getLikePostList(List<Long> postIdList) {
+    return queryFactory
+        .select(Projections.constructor(PostListGetResponse.class,
+            post.userEntity.nickname,
+            post.userEntity.profileImageUrl,
+            post.createdAt.stringValue().substring(0, 16),
+            post.title,
+            post.content,
+            JPAExpressions.select(postImage.postImageUrl)
+                .from(postImage)
+                .where(postImage.post.postId.eq(post.postId)
+                    .and(postImage.postImageId.eq(
+                        JPAExpressions.select(postImage.postImageId.min())
+                            .from(postImage)
+                            .where(postImage.post.postId.eq(post.postId))
+                    )))
+                .limit(1),
+            JPAExpressions.select(postLike.count())
+                .from(postLike)
+                .where(postLike.post.postId.eq(post.postId)),
+            JPAExpressions.select(comment.count())
+                .from(comment)
+                .where(comment.post.postId.eq(post.postId))
+        ))
+        .from(post)
+        .where(post.userEntity.userId.in(postIdList))
         .orderBy(post.createdAt.desc())
         .fetch();
   }
