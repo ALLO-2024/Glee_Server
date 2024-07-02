@@ -61,7 +61,6 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
     @Override
     public List<PostListGetResponse> getPostList(String sortType) {
 
-//        OrderSpecifier orderSpecifier = createOrderSpecifier(sortType);
         OrderSpecifier[] orderSpecifiers = createOrderSpecifier(sortType);
 
         List<PostListGetResponse> response = queryFactory
@@ -89,6 +88,39 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                 ))
                 .from(post)
                 .orderBy(orderSpecifiers)
+                .fetch();
+
+        return response;
+    }
+
+    @Override
+    public List<PostListGetResponse> getMySavePostList(Long userId) {
+        List<PostListGetResponse> response = queryFactory
+                .select(Projections.constructor(PostListGetResponse.class,
+                        post.userEntity.nickname,
+                        post.userEntity.profileImageUrl,
+                        post.createdAt.stringValue().substring(0, 16),
+                        post.title,
+                        post.content,
+                        JPAExpressions.select(postImage.postImageUrl)
+                                .from(postImage)
+                                .where(postImage.post.postId.eq(post.postId)
+                                        .and(postImage.postImageId.eq(
+                                                JPAExpressions.select(postImage.postImageId.min())
+                                                        .from(postImage)
+                                                        .where(postImage.post.postId.eq(post.postId))
+                                        )))
+                                .limit(1),
+                        JPAExpressions.select(postLike.count())
+                                .from(postLike)
+                                .where(postLike.post.postId.eq(post.postId)),
+                        JPAExpressions.select(comment.count())
+                                .from(comment)
+                                .where(comment.post.postId.eq(post.postId))
+                ))
+                .where(post.userEntity.userId.eq(userId))
+                .from(post)
+                .orderBy(post.createdAt.desc())
                 .fetch();
 
         return response;

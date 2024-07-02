@@ -51,4 +51,12 @@ public class PostController {
         List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername(), sortType);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
+
+    @Operation(summary = "내가 작성한 게시물 목록 조회 API")
+    @GetMapping("/my/save")
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getMySavePostList(@AuthenticationPrincipal UserDetails loginUser) {
+
+        List<PostListGetResponse> response = postService.getMySavePostList(loginUser.getUsername());
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
 }

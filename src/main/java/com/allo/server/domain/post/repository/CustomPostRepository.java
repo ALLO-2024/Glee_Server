@@ -12,4 +12,7 @@ public interface CustomPostRepository {
 
     // 게시물 목록 조회
     List<PostListGetResponse> getPostList(String sortType);
+
+    // 내가 작성한 게시물 목록 조회
+    List<PostListGetResponse> getMySavePostList(Long userId);
 }

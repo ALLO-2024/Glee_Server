@@ -82,4 +82,10 @@ public class PostService {
         return customPostRepository.getPostList(sortType);
     }
 
+    public List<PostListGetResponse> getMySavePostList(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customPostRepository.getMySavePostList(userEntity.getUserId());
+    }
+
 }
