@@ -41,7 +41,9 @@ public enum ErrorCode {
 
     COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다."),
 
-    IMAGE_UPLOAD_FAILD(false, 6000, "이미지 업로드 실패.")
+    INVALID_SORTTYPE(false, 7000, "잘못된 정렬 type 입니다."),
+
+    IMAGE_UPLOAD_FAILD(false, 8000, "이미지 업로드 실패.")
     ;
 
     private final boolean isSuccess;
