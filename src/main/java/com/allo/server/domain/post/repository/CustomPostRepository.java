@@ -18,4 +18,7 @@ public interface CustomPostRepository {
 
     // 좋아요한 게시물 조회
     List<PostListGetResponse> getLikePostList(List<Long> postIdList);
+
+    // 게시물 제목 검색
+    List<PostListGetResponse> searchPostList(String title);
 }

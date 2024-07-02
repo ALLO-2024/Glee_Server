@@ -98,4 +98,10 @@ public class PostService {
             .toList();
         return customPostRepository.getLikePostList(postIdList);
     }
+
+    public List<PostListGetResponse> searchPostList(String email, String title) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customPostRepository.searchPostList(title);
+    }
 }

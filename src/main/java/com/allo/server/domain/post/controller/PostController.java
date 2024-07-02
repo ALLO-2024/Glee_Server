@@ -67,4 +67,12 @@ public class PostController {
         List<PostListGetResponse> response = postService.getLikePostList(loginUser.getUsername());
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
+
+    @Operation(summary = "게시물 검색 API")
+    @GetMapping("/search/{title}")
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> searchPostList(@AuthenticationPrincipal UserDetails loginUser, @PathVariable String title) {
+
+        List<PostListGetResponse> response = postService.searchPostList(loginUser.getUsername(), title);
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
 }
