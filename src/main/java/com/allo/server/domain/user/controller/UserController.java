@@ -10,10 +10,12 @@ import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.allo.server.response.BaseResponseStatus.SUCCESS;
 
@@ -31,9 +33,13 @@ public class UserController {
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 
-    @PatchMapping("/my/profile")
-    public ResponseEntity<BaseResponse> userMyProfile(@AuthenticationPrincipal UserDetails loginUser, @RequestBody @Valid UserMyProfileRequest userMyProfileRequest) {
-        userService.userMyProfile(loginUser.getUsername(), userMyProfileRequest);
+    @PatchMapping(value = "/my/profile",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BaseResponse> userMyProfile(
+        @AuthenticationPrincipal UserDetails loginUser,
+        @RequestPart(value = "userMyProfileRequest", required = true) @Valid UserMyProfileRequest userMyProfileRequest,
+        @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+        userService.userMyProfile(loginUser.getUsername(), userMyProfileRequest, multipartFile);
         return ResponseEntity.ok(new BaseResponse<>(SUCCESS));
     }
 

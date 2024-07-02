@@ -11,11 +11,13 @@ import com.allo.server.domain.post_image.dto.response.PostImageGetResponse;
 import com.allo.server.domain.post_image.entity.PostImage;
 import com.allo.server.domain.post_image.repository.CustomPostImageRepository;
 import com.allo.server.domain.post_image.repository.PostImageRepository;
+import com.allo.server.domain.post_like.entity.PostLike;
 import com.allo.server.domain.post_like.repository.PostLikeRepository;
 import com.allo.server.domain.user.entity.UserEntity;
 import com.allo.server.domain.user.repository.UserRepository;
 import com.allo.server.error.exception.custom.BadRequestException;
 import com.allo.server.global.s3.S3Service;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,4 +84,18 @@ public class PostService {
         return customPostRepository.getPostList();
     }
 
+    public List<PostListGetResponse> getMyPostList(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customPostRepository.getMyPostList(userEntity.getUserId());
+    }
+
+    public List<PostListGetResponse> getLikePostList(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+        List<PostLike> postLikeList = postLikeRepository.findAllByUserEntity(userEntity);
+        List<Long> postIdList = postLikeList.stream()
+            .map(postLike -> postLike.getPost().getPostId())
+            .toList();
+        return customPostRepository.getLikePostList(postIdList);
+    }
 }

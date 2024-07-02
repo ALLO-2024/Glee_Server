@@ -51,4 +51,20 @@ public class PostController {
         List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername());
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
+
+    @Operation(summary = "마이페이지 - 내가 쓴 게시물")
+    @GetMapping("/mypage/list")
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getMyPostList(@AuthenticationPrincipal UserDetails loginUser) {
+
+        List<PostListGetResponse> response = postService.getMyPostList(loginUser.getUsername());
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
+
+    @Operation(summary = "마이페이지 - 관심 게시물")
+    @GetMapping("/like/list")
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getLikePostList(@AuthenticationPrincipal UserDetails loginUser) {
+
+        List<PostListGetResponse> response = postService.getLikePostList(loginUser.getUsername());
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
 }
