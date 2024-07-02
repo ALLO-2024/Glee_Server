@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.allo.server.error.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static com.allo.server.error.ErrorCode.IMAGE_UPLOAD_FAILD;
 import static com.allo.server.error.ErrorCode.UNKNOWN_LANGUAGE;
 import static com.allo.server.error.ErrorCode.USER_NOT_FOUND;
 
@@ -41,8 +42,7 @@ public class UserService {
     }
 
     @Transactional
-    public void userMyProfile(String email, UserMyProfileRequest userMyProfileRequest, MultipartFile multipartFile)
-        throws IOException {
+    public void userMyProfile(String email, UserMyProfileRequest userMyProfileRequest, MultipartFile multipartFile) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
         String curNickname = userEntity.getNickname();
         String nickname = userMyProfileRequest.nickname();
@@ -57,9 +57,13 @@ public class UserService {
 
         // 프로필 이미지 교체
         if (multipartFile != null) {
-            CompletableFuture<URL> future = s3Service.uploadFile(multipartFile);
-            profileImageUrl = future.thenApply(URL::toString).join();
-            userEntity.updateProfileImage(profileImageUrl);
+            try {
+                CompletableFuture<URL> future = s3Service.uploadFile(multipartFile);
+                profileImageUrl = future.thenApply(URL::toString).join();
+                userEntity.updateProfileImage(profileImageUrl);
+            } catch (IOException e) {
+                throw new BadRequestException(IMAGE_UPLOAD_FAILD);
+            }
         }
 
         // 이전 닉네임이 아니라면 중복검사

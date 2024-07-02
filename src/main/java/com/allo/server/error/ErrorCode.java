@@ -39,7 +39,9 @@ public enum ErrorCode {
 
     POST_NOT_FOUND(false, 5000, "해당 id의 post를 찾을 수 없습니다."),
 
-    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다.")
+    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다."),
+
+    IMAGE_UPLOAD_FAILD(false, 6000, "이미지 업로드 실패.")
     ;
 
     private final boolean isSuccess;
