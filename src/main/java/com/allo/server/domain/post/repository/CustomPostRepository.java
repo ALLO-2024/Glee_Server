@@ -11,5 +11,5 @@ public interface CustomPostRepository {
     PostInfoResponse getPost(Long userId, Long postId);
 
     // 게시물 목록 조회
-    List<PostListGetResponse> getPostList();
+    List<PostListGetResponse> getPostList(String sortType);
 }

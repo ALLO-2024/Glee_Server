@@ -38,7 +38,9 @@ public enum ErrorCode {
 
     POST_NOT_FOUND(false, 5000, "해당 id의 post를 찾을 수 없습니다."),
 
-    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다.")
+    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다."),
+
+    INVALID_SORTTYPE(false, 7000, "잘못된 정렬 type 입니다.")
     ;
 
     private final boolean isSuccess;

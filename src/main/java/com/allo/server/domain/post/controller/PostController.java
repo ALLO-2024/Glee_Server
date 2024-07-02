@@ -46,9 +46,9 @@ public class PostController {
 
     @Operation(summary = "저장된 게시물 목록 조회 API")
     @GetMapping("/list")
-    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getPostList(@AuthenticationPrincipal UserDetails loginUser) {
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getPostList(@AuthenticationPrincipal UserDetails loginUser, @RequestParam(name = "sortType", defaultValue = "createdAt", required = false) String sortType) {
 
-        List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername());
+        List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername(), sortType);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 }
