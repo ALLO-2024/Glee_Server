@@ -78,10 +78,10 @@ public class PostService {
         return PostGetResponse.of(postInfoResponse, postImageGetResponses);
     }
 
-    public List<PostListGetResponse> getPostList(String email) {
+    public List<PostListGetResponse> getPostList(String email, String sortType) {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
 
-        return customPostRepository.getPostList();
+        return customPostRepository.getPostList(sortType);
     }
 
     public List<PostListGetResponse> getMyPostList(String email) {
@@ -97,5 +97,11 @@ public class PostService {
             .map(postLike -> postLike.getPost().getPostId())
             .toList();
         return customPostRepository.getLikePostList(postIdList);
+    }
+
+    public List<PostListGetResponse> searchPostList(String email, String title) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        return customPostRepository.searchPostList(title);
     }
 }

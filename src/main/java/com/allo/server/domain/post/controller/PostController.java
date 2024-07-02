@@ -46,9 +46,9 @@ public class PostController {
 
     @Operation(summary = "저장된 게시물 목록 조회 API")
     @GetMapping("/list")
-    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getPostList(@AuthenticationPrincipal UserDetails loginUser) {
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getPostList(@AuthenticationPrincipal UserDetails loginUser, @RequestParam(name = "sortType", defaultValue = "createdAt", required = false) String sortType) {
 
-        List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername());
+        List<PostListGetResponse> response = postService.getPostList(loginUser.getUsername(), sortType);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 
@@ -65,6 +65,14 @@ public class PostController {
     public ResponseEntity<BaseResponse<List<PostListGetResponse>>> getLikePostList(@AuthenticationPrincipal UserDetails loginUser) {
 
         List<PostListGetResponse> response = postService.getLikePostList(loginUser.getUsername());
+        return ResponseEntity.ok(new BaseResponse<>(response));
+    }
+
+    @Operation(summary = "게시물 검색 API")
+    @GetMapping("/search/{title}")
+    public ResponseEntity<BaseResponse<List<PostListGetResponse>>> searchPostList(@AuthenticationPrincipal UserDetails loginUser, @PathVariable String title) {
+
+        List<PostListGetResponse> response = postService.searchPostList(loginUser.getUsername(), title);
         return ResponseEntity.ok(new BaseResponse<>(response));
     }
 }
