@@ -20,14 +20,17 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<CommentSaveResponse> getComments(Long userId, Long postId) {
+    public List<CommentSaveResponse> getComments(Long postId) {
         List<CommentSaveResponse> response = queryFactory
                 .select(Projections.constructor(CommentSaveResponse.class,
+                        comment.commentId,
                         comment.userEntity.userId,
                         comment.userEntity.nickname,
                         comment.userEntity.profileImageUrl,
                         comment.content,
-                        comment.createdAt.stringValue().substring(0, 16)))
+                        comment.createdAt.stringValue().substring(0, 16),
+                        comment.parentComment.commentId
+                ))
                 .from(comment)
                 .where(comment.post.postId.eq(postId))
                 .orderBy(comment.createdAt.asc())

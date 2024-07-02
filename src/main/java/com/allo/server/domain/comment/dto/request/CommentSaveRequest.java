@@ -7,7 +7,7 @@ public record CommentSaveRequest (@NotBlank(message = "댓글은 필수 입력 �
                                String content,
                                @NotNull(message = "Post_Id은 필수 입력 값입니다.")
                                Long postId,
-                               Long parent_id
+                               Long parentId
 ){
 }
 ;
