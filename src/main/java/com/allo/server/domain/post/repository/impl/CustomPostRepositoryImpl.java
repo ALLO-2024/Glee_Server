@@ -67,6 +67,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                         post.userEntity.nickname,
                         post.userEntity.profileImageUrl,
                         post.createdAt.stringValue().substring(0, 16),
+                        post.postId,
                         post.title,
                         post.content,
                         JPAExpressions.select(postImage.postImageUrl)
@@ -99,6 +100,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
             post.userEntity.nickname,
             post.userEntity.profileImageUrl,
             post.createdAt.stringValue().substring(0, 16),
+            post.postId,
             post.title,
             post.content,
             JPAExpressions.select(postImage.postImageUrl)
@@ -130,6 +132,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
             post.userEntity.nickname,
             post.userEntity.profileImageUrl,
             post.createdAt.stringValue().substring(0, 16),
+            post.postId,
             post.title,
             post.content,
             JPAExpressions.select(postImage.postImageUrl)
@@ -161,6 +164,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                         post.userEntity.nickname,
                         post.userEntity.profileImageUrl,
                         post.createdAt.stringValue().substring(0, 16),
+                        post.postId,
                         post.title,
                         post.content,
                         JPAExpressions.select(postImage.postImageUrl)
