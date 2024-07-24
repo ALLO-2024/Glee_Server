@@ -15,6 +15,8 @@ public enum ErrorCode {
     NOT_ALLOWED_MEMBER(false,2005, "해당 요청에 대한 권한이 없습니다."),
     NOT_AUTHENTICATED_REQUEST(false,2006, "유효한 JWT 토큰이 없습니다."),
     FILE_NOT_FOUND(false,2007, "파일이 존재하지 않습니다."),
+    FAIL_OAUTH_TOKEN(false,2008, "OAuth token 을 구하지 못했습니다.."),
+    UNKNOWN_LANGUAGE(false,2009, "알 수 없는 언어입니다."),
 
     USER_NOT_FOUND(false,2008, "사용자를 찾을 수 없습니다."),
     INVALID_ROLE_NAME(false,2009, "유효한 ROLE_NAME 이 없습니다."),
@@ -32,9 +34,16 @@ public enum ErrorCode {
     UNKNOWN_LECTURE_SUBJECT(false,3003, "lectureSubject 값이 HUMANITY, SOCIAL, EDUCATION, SCIENCE, ENTERTAINMENT와 CULTURE가 아닙니다."),
 
     UNKNOWN_WORD(false,4000, "word 값이 한국어 기초사전에 존재하지 않는 단어 입니다."),
-    ALREADY_EXIST_WORD(false,4001, "이미 존재하는 단어 입니다.")
+    ALREADY_EXIST_WORD(false,4001, "이미 존재하는 단어 입니다."),
+    NO_EXIST_WORD(false,4001, "존재하지 않는 단어 입니다."),
 
+    POST_NOT_FOUND(false, 5000, "해당 id의 post를 찾을 수 없습니다."),
 
+    COMMENT_NOT_FOUND(false, 6000, "해당 id의 comment를 찾을 수 없습니다."),
+
+    INVALID_SORTTYPE(false, 7000, "잘못된 정렬 type 입니다."),
+
+    IMAGE_UPLOAD_FAILD(false, 8000, "이미지 업로드 실패.")
     ;
 
     private final boolean isSuccess;

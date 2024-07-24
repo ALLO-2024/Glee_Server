@@ -73,9 +73,9 @@ public class UserEntity extends BaseEntity {
         this.isOptionAgr = isOptionAgr;
     }
 
-    public void updateMyProfile(String nickname, String profileImageUrl) {
+    public void updateNicknameAndLanguage(String nickname, String language) {
         this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+        this.language = Language.valueOf(language);
     }
 
     public void updateProfileImage(String profileImageUrl) {

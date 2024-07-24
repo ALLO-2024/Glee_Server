@@ -37,6 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +65,7 @@ public class WordService {
         Optional<Word> existWord = wordRepository.findByUserEntityAndWord(userEntity, word);
 
         if (existWord.isPresent()) {
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getExample(), Boolean.TRUE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(existWord.get().getWord(), existWord.get().getMeaning(), existWord.get().getPos(), existWord.get().getTrans_word(), existWord.get().getExample(), Boolean.TRUE, existWord.get().getWordId());
             return wordSearchResponse;
         }
         else {
@@ -141,7 +144,7 @@ public class WordService {
             String trans_word = getMeanResponse.getChannel().getItem().get(0).getSense().get(0).getTranslation().get(0).getTrans_word();
             String example = getExampleResponse.getChannel().getItem().get(0).getExample();
 
-            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, example, Boolean.FALSE);
+            WordSearchResponse wordSearchResponse = new WordSearchResponse(word, meaning, pos, trans_word, example, Boolean.FALSE, 0L);
 
             return wordSearchResponse;
         }
@@ -159,6 +162,33 @@ public class WordService {
             Word saveWord = WordSaveRequest.wordToEntity(userEntity, wordSaveRequest);
             wordRepository.save(saveWord);
         }
+    }
+
+    public void deleteWord(String email, Long wordId){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+
+        Optional<Word> word = wordRepository.findByUserEntityAndWordId(userEntity, wordId);
+        if (!word.isPresent()) {
+            throw new BadRequestException(NO_EXIST_WORD);
+        }
+        else {
+            wordRepository.deleteById(wordId);
+        }
+    }
+
+    public List<WordGetResponse> getAll(String email){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException(USER_NOT_FOUND));
+        List<Word> words = wordRepository.findAllByUserEntityOrderByCreatedAtDesc(userEntity);
+
+        List<WordGetResponse> list = new ArrayList<>();
+        for(Word word : words){
+            WordGetResponse response = new WordGetResponse(word.getWordId(), word.getWord(), word.getMeaning(), word.getPos(), word.getTrans_word(), word.getExample());
+            list.add(response);
+        }
+
+        return list;
     }
 
     public List<WordGetResponse> getWord(String email, Pageable pageable){

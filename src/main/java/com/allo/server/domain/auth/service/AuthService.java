@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 import static com.allo.server.error.ErrorCode.*;
 
@@ -49,7 +51,8 @@ public class AuthService {
             throw new BadRequestException(FILE_NOT_FOUND);
         }
         else {
-            profileImageUrl = s3Service.uploadFile(multipartFile);
+            CompletableFuture<URL> future = s3Service.uploadFile(multipartFile);
+            profileImageUrl = future.thenApply(URL::toString).join();
         }
 
         UserEntity userEntity = request.toEntity(profileImageUrl);
@@ -76,7 +79,8 @@ public class AuthService {
             throw new BadRequestException(FILE_NOT_FOUND);
         }
         else {
-            profileImageUrl = s3Service.uploadFile(multipartFile);
+            CompletableFuture<URL> future = s3Service.uploadFile(multipartFile);
+            profileImageUrl = future.thenApply(URL::toString).join();
         }
 
         userEntity.updateSocialUser(nickname, profileImageUrl, Role.USER, language, isOptionAgr);

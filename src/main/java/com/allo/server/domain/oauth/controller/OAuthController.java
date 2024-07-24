@@ -1,8 +1,10 @@
 package com.allo.server.domain.oauth.controller;
 
+import com.allo.server.domain.oauth.dto.request.SocialLoginCodeRequest;
 import com.allo.server.domain.oauth.dto.request.SocialLoginRequest;
 import com.allo.server.domain.oauth.dto.response.LoginResponse;
 import com.allo.server.domain.oauth.service.OAuthService;
+import com.allo.server.domain.user.entity.SocialType;
 import com.allo.server.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
