@@ -54,8 +54,10 @@ public class PostService {
 
         List<CompletableFuture<URL>> futures = new ArrayList<>();
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            futures.add(s3Service.uploadFile(multipartFile));
+        if (multipartFiles != null) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                futures.add(s3Service.uploadFile(multipartFile));
+            }
         }
 
         futures.forEach(future -> {
