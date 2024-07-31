@@ -94,7 +94,7 @@ public class LectureService {
         contentRepository.save(content);
         lecture.setContent(content);
 
-         saveContent("eng", lecture.getLectureId(), file, content, language);
+        saveContent("eng", lecture.getLectureId(), file, content, language);
     }
 
     private File saveFileInLocal(MultipartFile multipartFile) throws IOException {
@@ -119,9 +119,8 @@ public class LectureService {
         return localFile;
     }
 
-    @Async
     @Transactional
-    protected void saveContent(String category, Long lectureId, File file, Content content, String language) throws IOException {
+    public void saveContent(String category, Long lectureId, File file, Content content, String language) throws IOException {
         // 대상 서버 URL
         String targetUrl = "http://59.29.138.9:5603/glee/asr";
         RestTemplate restTemplate = new RestTemplate();
@@ -130,11 +129,14 @@ public class LectureService {
 
         byte[] fileBytes = null;
         try {
+            log.info("read bytes from file");
             fileBytes = Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             // 예외 처리
             log.info("cant get bytes from file");
         }
+
+        log.info("read bytes from files success");
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -148,6 +150,8 @@ public class LectureService {
 
         // HTTP 엔터티 생성
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        log.info("post request to ai server");
 
         // 서버로 POST 요청 전송
         ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -178,7 +182,6 @@ public class LectureService {
         }
     }
 
-    @Async
     @Transactional
     public void requestContentInfo(Content content, String language) {
         String url = "http://59.29.138.9:5603/glee/translate";
@@ -191,6 +194,8 @@ public class LectureService {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         RestTemplate restTemplate = new RestTemplate();
+
+        log.info("content info request");
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
@@ -217,7 +222,6 @@ public class LectureService {
         }
     }
 
-    @Async
     @Transactional
     public void requestSummary(Content content, String reqString, boolean isTranslated) {
         String url = "http://59.29.138.9:5603/glee/summary";
@@ -230,6 +234,7 @@ public class LectureService {
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         RestTemplate restTemplate = new RestTemplate();
 
+        log.info("summary request");
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         HttpStatusCode statusCode = responseEntity.getStatusCode();
@@ -255,7 +260,6 @@ public class LectureService {
         }
     }
 
-    @Async
     @Transactional
     public void requestKeywords(Content content) {
         String url = "http://59.29.138.9:5603/glee/keyword";
@@ -267,6 +271,8 @@ public class LectureService {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         RestTemplate restTemplate = new RestTemplate();
+
+        log.info("keyword request");
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
