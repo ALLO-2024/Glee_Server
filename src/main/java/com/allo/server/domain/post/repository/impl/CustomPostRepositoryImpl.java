@@ -152,7 +152,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                 .where(comment.post.postId.eq(post.postId))
         ))
         .from(post)
-        .where(post.userEntity.userId.in(postIdList))
+        .where(post.postId.in(postIdList))
         .orderBy(post.createdAt.desc())
         .fetch();
   }
